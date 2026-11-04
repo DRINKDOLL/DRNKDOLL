@@ -1,0 +1,37 @@
+# ===== 运行时 / 构建产物（体积大、非源代码） =====
+# JDK 发行包（整目录，约 1GB）
+output/plaza-20261103/halo-lab/tools/
+output/plaza-20261103/halo-lab/jars/*.jar
+output/plaza-20261103/halo-lab/jars/*.jar.bak-*
+
+# Halo 插件 jar 与数据库文件
+output/plaza-20261103/halo-cn/workdir/plugins/*.jar
+output/plaza-20261103/halo-cn/workdir/db/
+output/plaza-20261103/halo-cn/archive/
+
+# halo-lab 实验插件与运行产物
+output/plaza-20261103/halo-lab/work/
+output/plaza-20261103/halo-lab/logs/
+output/plaza-20261103/halo-lab/evidence/
+
+# 部署打包产物
+output/plaza-20261103/deploy/pkg/
+output/plaza-20261103/deploy/*.tar.gz
+
+# 日志
+*.log
+*.log.*.gz
+**/logs/
+
+# Node 依赖
+**/node_modules/
+
+# ===== 系统 / 编辑器 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== 会话/临时文件 =====
+.output/
+*.tmp
+*.swp

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="docx-page-size" content="A4">
+<title>成果展示广场平台需求文档</title>
+<style>
+:root {
+    --typography-fontFamily-heading: "SimHei", "黑体", sans-serif;
+    --typography-fontFamily-body: "SimSun", "宋体", serif;
+    --typography-fontSize-coverTitle: 30pt;
+    --typography-fontSize-coverCategory: 12pt;
+    --typography-fontSize-h1: 18pt;
+    --typography-fontSize-h2: 14pt;
+    --typography-fontSize-h3: 12pt;
+    --typography-fontSize-body: 12pt;
+    --typography-fontSize-small: 10.5pt;
+    --typography-lineHeight-body: 1.6;
+    --typography-lineHeight-heading: 1.4;
+    --typography-fontWeight-heading: 700;
+    --typography-fontWeight-body: 400;
+    --color-primary: #1565C0;
+    --color-heading: #1A237E;
+    --color-text: #212121;
+    --color-textSecondary: #616161;
+    --color-divider: #E0E0E0;
+    --color-background: #FFFFFF;
+    --color-surface: #F5F7FA;
+    --color-accent: #00897B;
+    --spacing-paragraph: 0.55em;
+    --spacing-sectionGap: 1.6em;
+    --layout-marginTop: 2.5cm;
+    --layout-marginBottom: 2.0cm;
+    --layout-marginLeft: 2.5cm;
+    --layout-marginRight: 2.5cm;
+    --layout-pageSize: A4;
+    --layout-maxContentWidth: 160mm;
+    --fs-cover-title: var(--typography-fontSize-coverTitle, 30pt);
+    --fs-cover-cat: var(--typography-fontSize-coverCategory, 12pt);
+    --fs-h1: var(--typography-fontSize-h1, 18pt);
+    --fs-h2: var(--typography-fontSize-h2, 14pt);
+    --fs-body: var(--typography-fontSize-body, 12pt);
+    --fs-small: var(--typography-fontSize-small, 10.5pt);
+    --ff-heading: var(--typography-fontFamily-heading, "SimHei", sans-serif);
+    --ff-body: var(--typography-fontFamily-body, "SimSun", serif);
+    --lh-body: var(--typography-lineHeight-body, 1.6);
+    --lh-heading: var(--typography-lineHeight-heading, 1.4);
+    --fw-heading: var(--typography-fontWeight-heading, 700);
+    --color-primary: var(--color-primary, #1565C0);
+    --color-heading: var(--color-heading, #1A237E);
+    --color-text: var(--color-text, #212121);
+    --color-muted: var(--color-textSecondary, #616161);
+    --color-border: var(--color-divider, #E0E0E0);
+    --color-surface: var(--color-surface, #F5F7FA);
+    --color-page: var(--color-background, #FFFFFF);
+    --sp-paragraph: var(--spacing-paragraph, 0.55em);
+    --sp-section: var(--spacing-sectionGap, 1.6em);
+    --sp-list-indent: var(--spacing-listIndent, 2.2em);
+    --sp-li-gap: var(--spacing-listItemGap, 0.25em);
+    --sp-h1-pad: var(--spacing-h1Padding, 6px 0 6px 10px);
+    --sp-h1-top: var(--spacing-h1MarginTop, 1.6em);
+    --sp-h1-bottom: var(--spacing-h1MarginBottom, 0.9em);
+    --sp-h2-top: var(--spacing-h2MarginTop, 1.2em);
+    --sp-h2-bottom: var(--spacing-h2MarginBottom, 0.5em);
+    --sp-table-top: var(--spacing-tableMarginTop, 0.4em);
+    --sp-table-bottom: var(--spacing-tableMarginBottom, 0.9em);
+    --sp-cell-pad: var(--spacing-cellPadding, 5px 6px);
+    --sp-cover-title: var(--spacing-coverTitleMargin, 0.55em 0 0.35em 0);
+    --sp-cover-meta: var(--spacing-coverMetaMargin, 0.2em 0 0 0);
+    --sp-toc-li: var(--spacing-tocItemGap, 0.1em);
+    --sp-toc-sub-indent: var(--spacing-tocSubIndent, 1.8em);
+    --sp-toc-sub: var(--spacing-tocSubMargin, 0.1em 0 0.3em 0);
+    --margin-page: var(--layout-marginLeft, 2.5cm);
+    --page-content-width: var(--layout-maxContentWidth, 160mm);
+}
+@page { @bottom-center { content: counter(page); } }
+@page cover { @bottom-center { content: none; } }
+section[role="cover"] { page: cover; }
+* { box-sizing: border-box; }
+body {
+    font-family: var(--ff-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-text);
+    background: var(--color-page);
+    max-width: var(--page-content-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+p.body {
+    font-family: var(--ff-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-text);
+    text-indent: 2em;
+    margin: 0 0 var(--sp-paragraph) 0;
+    text-align: justify;
+}
+p.sum-p {
+    font-family: var(--ff-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-text);
+    text-indent: 2em;
+    margin: 0 0 var(--sp-paragraph) 0;
+    text-align: justify;
+}
+ul.bullet, ol.num {
+    margin: 0 0 var(--sp-paragraph) 0;
+    padding-left: var(--sp-list-indent);
+    font-family: var(--ff-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-text);
+}
+ul.bullet li, ol.num li {
+    text-indent: 0;
+    margin-bottom: var(--sp-li-gap);
+    text-align: justify;
+}
+h1.chapter {
+    font-family: var(--ff-heading);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-heading);
+    font-weight: var(--fw-heading);
+    color: var(--color-heading);
+    border-left: 5px solid var(--color-primary);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--sp-h1-pad);
+    margin: var(--sp-h1-top) 0 var(--sp-h1-bottom) 0;
+    text-indent: 0;
+    page-break-after: avoid;
+}
+h2 {
+    font-family: var(--ff-heading);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-heading);
+    font-weight: var(--fw-heading);
+    color: var(--color-primary);
+    margin: var(--sp-h2-top) 0 var(--sp-h2-bottom) 0;
+    text-indent: 0;
+    page-break-after: avoid;
+}
+table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--sp-table-top) 0 var(--sp-table-bottom) 0;
+    font-family: var(--ff-body);
+    font-size: var(--fs-small);
+    line-height: var(--lh-heading);
+    color: var(--color-text);
+}
+table.tbl th {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--sp-cell-pad);
+    font-family: var(--ff-heading);
+    font-size: var(--fs-small);
+    font-weight: var(--fw-heading);
+    color: var(--color-heading);
+    text-align: left;
+    text-indent: 0;
+}
+table.tbl td {
+    border: 1px solid var(--color-border);
+    padding: var(--sp-cell-pad);
+    vertical-align: top;
+    text-indent: 0;
+}
+table.executive-summary {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--sp-table-top) 0 var(--sp-section) 0;
+}
+table.executive-summary th {
+    background: var(--color-primary);
+    color: var(--color-page);
+    font-family: var(--ff-heading);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-heading);
+    text-align: left;
+    padding: var(--sp-cell-pad);
+    border: 1px solid var(--color-primary);
+}
+table.executive-summary td {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--sp-cell-pad);
+}
+.cover-cat {
+    font-family: var(--ff-heading);
+    font-size: var(--fs-cover-cat);
+    color: var(--color-primary);
+    font-weight: var(--fw-heading);
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-indent: 0;
+    margin: 5.5cm 0 0 0;
+}
+.cover-title {
+    font-family: var(--ff-heading);
+    font-size: var(--fs-cover-title);
+    font-weight: var(--fw-heading);
+    color: var(--color-heading);
+    line-height: var(--lh-heading);
+    text-align: center;
+    text-indent: 0;
+    margin: var(--sp-cover-title);
+}
+.cover-sub {
+    font-family: var(--ff-body);
+    font-size: var(--fs-h2);
+    color: var(--color-muted);
+    text-align: center;
+    text-indent: 0;
+    margin: 0 0 3cm 0;
+}
+.cover-meta {
+    font-family: var(--ff-body);
+    font-size: var(--fs-small);
+    color: var(--color-muted);
+    text-align: center;
+    text-indent: 0;
+    line-height: var(--lh-heading);
+    margin: var(--sp-cover-meta);
+}
+.cover-foot {
+    font-family: var(--ff-body);
+    font-size: var(--fs-small);
+    color: var(--color-muted);
+    text-align: center;
+    text-indent: 0;
+    margin: 2.4cm 0 0 0;
+}
+.doc-toc { padding: 0; margin: 0; }
+.toc-title {
+    font-family: var(--ff-heading);
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-heading);
+    color: var(--color-heading);
+    text-align: center;
+    text-indent: 0;
+    margin: 1.2cm 0 0.8cm 0;
+}
+.toc-list, .toc-list ol, .toc-list ul {
+    list-style: none;
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+.toc-list li {
+    font-family: var(--ff-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    text-indent: 0;
+    margin-bottom: var(--sp-toc-li);
+}
+.toc-list > li > a {
+    color: var(--color-heading);
+    font-family: var(--ff-heading);
+    font-weight: var(--fw-heading);
+    text-decoration: none;
+}
+.toc-list ol.toc-sub {
+    padding-left: var(--sp-toc-sub-indent);
+    margin: var(--sp-toc-sub);
+}
+.toc-list ol.toc-sub li {
+    font-size: var(--fs-small);
+    line-height: var(--lh-heading);
+}
+.toc-list ol.toc-sub a {
+    color: var(--color-muted);
+    text-decoration: none;
+}
+</style>
+</head>
+<body>
+<section role="cover">
+  <p class="cover-cat">警院 WeChat 全生态五平台 · 第四平台细化</p>
+  <p class="cover-title">成果展示广场平台需求文档</p>
+  <p class="cover-sub">展成果 · 做反馈 · 做传承</p>
+  <p class="cover-meta">文档版本：V1.0（首版，待评审）</p>
+  <p class="cover-meta">编制日期：2026 年 11 月 3 日</p>
+  <p class="cover-meta">文档负责人：成果展示广场平台负责人</p>
+  <p class="cover-meta">上游依据：总纲 V1.0 第三章 / 3.7 / 3.9 / M4</p>
+  <p class="cover-foot">本文档为五平台需求文档体系第四册，编号规则与总纲保持一致</p>
+</section>
+<section role="cover">
+<nav class="doc-toc" aria-label="文档目录">
+<p class="toc-title">目 录</p>
+<ol class="toc-list">
+<li><a href="#section-1">第一章 文档控制信息</a>
+<ol class="toc-sub">
+<li><a href="#section-1-1">1.1 章节覆盖说明</a></li>
+<li><a href="#section-1-2">1.2 需求编号与优先级规则</a></li>
+</ol></li>
+<li><a href="#section-2">第二章 平台定位与建设目标</a>
+<ol class="toc-sub">
+<li><a href="#section-2-1">2.1 平台定位</a></li>
+<li><a href="#section-2-2">2.2 在五平台闭环中的位置</a></li>
+<li><a href="#section-2-3">2.3 建设目标</a></li>
+<li><a href="#section-2-4">2.4 成功衡量指标</a></li>
+<li><a href="#section-2-5">2.5 与总纲边界的确认（重要）</a></li>
+</ol></li>
+<li><a href="#section-3">第三章 用户、角色与权限</a>
+<ol class="toc-sub">
+<li><a href="#section-3-1">3.1 用户类型</a></li>
+<li><a href="#section-3-2">3.2 角色权限矩阵</a></li>
+<li><a href="#section-3-3">3.3 登录与身份</a></li>
+<li><a href="#section-3-4">3.4 访客态与校友态的特殊规则</a></li>
+</ol></li>
+<li><a href="#section-4">第四章 功能需求</a>
+<ol class="toc-sub">
+<li><a href="#section-4-1">4.1 功能清单总表</a></li>
+<li><a href="#section-4-2">4.2 SP-FR-01 作品投稿与上墙（P0）</a></li>
+<li><a href="#section-4-3">4.3 SP-FR-02 展示墙与首页组织（P0）</a></li>
+<li><a href="#section-4-4">4.4 SP-FR-03 作品详情页（P0）</a></li>
+<li><a href="#section-4-5">4.5 SP-FR-04 在线体验与外链中转（P0）</a></li>
+<li><a href="#section-4-6">4.6 SP-FR-05 评论与点赞（P0）</a></li>
+<li><a href="#section-4-7">4.7 SP-FR-06 星级评分与质量参考（P0）</a></li>
+<li><a href="#section-4-8">4.8 SP-FR-07 版本迭代与变更记录（P1）</a></li>
+<li><a href="#section-4-9">4.9 SP-FR-08 搜索与筛选（P1）</a></li>
+<li><a href="#section-4-10">4.10 SP-FR-09 质量参考榜与精选（P1）</a></li>
+<li><a href="#section-4-11">4.11 SP-FR-10 置顶与教学范例（P0）</a></li>
+<li><a href="#section-4-12">4.12 SP-FR-11 课例回流授权（P1）</a></li>
+<li><a href="#section-4-13">4.13 SP-FR-12 内容治理与巡查（P0）</a></li>
+<li><a href="#section-4-14">4.14 SP-FR-13 举报与申诉（P0）</a></li>
+<li><a href="#section-4-15">4.15 SP-FR-14 数据看板与埋点（P1）</a></li>
+<li><a href="#section-4-16">4.16 SP-FR-15 广场 PC 管理后台（P0）</a></li>
+</ol></li>
+<li><a href="#section-5">第五章 业务流程</a>
+<ol class="toc-sub">
+<li><a href="#section-5-1">5.1 SP-BP-01 工坊项目推送上墙流程</a></li>
+<li><a href="#section-5-2">5.2 SP-BP-02 自主投稿流程</a></li>
+<li><a href="#section-5-3">5.3 SP-BP-03 在线体验与反馈流程</a></li>
+<li><a href="#section-5-4">5.4 SP-BP-04 巡查与下架处置流程</a></li>
+<li><a href="#section-5-5">5.5 SP-BP-05 置顶与课例回流流程</a></li>
+<li><a href="#section-5-6">5.6 SP-BP-06 毕业归档与校友态流程</a></li>
+</ol></li>
+<li><a href="#section-6">第六章 数据模型</a>
+<ol class="toc-sub">
+<li><a href="#section-6-1">6.1 核心表清单</a></li>
+<li><a href="#section-6-2">6.2 建模约束</a></li>
+</ol></li>
+<li><a href="#section-7">第七章 接口与集成</a>
+<ol class="toc-sub">
+<li><a href="#section-7-1">7.1 复用的底座接口</a></li>
+<li><a href="#section-7-2">7.2 广场新增接口</a></li>
+<li><a href="#section-7-3">7.3 事件定义</a></li>
+<li><a href="#section-7-4">7.4 失败处理</a></li>
+<li><a href="#section-7-5">7.5 贡献权重与积分分账</a></li>
+</ol></li>
+<li><a href="#section-8">第八章 非功能需求</a>
+</li>
+<li><a href="#section-9">第九章 内容安全与合规（含 NFR-02 偏离声明）</a>
+<ol class="toc-sub">
+<li><a href="#section-9-1">9.1 偏离事项</a></li>
+<li><a href="#section-9-2">9.2 补偿性控制（偏离的生效前提）</a></li>
+<li><a href="#section-9-3">9.3 责任主体</a></li>
+<li><a href="#section-9-4">9.4 需确认事项</a></li>
+</ol></li>
+<li><a href="#section-10">第十章 页面清单</a>
+</li>
+<li><a href="#section-11">第十一章 验收标准</a>
+</li>
+<li><a href="#section-12">第十二章 依赖与风险</a>
+</li>
+<li><a href="#section-13">第十三章 待决策事项</a>
+</li>
+<li><a href="#section-14">附录 A 与总纲的对应关系</a>
+</li>
+<li><a href="#section-15">附录 B 本文档假设清单</a>
+</li>
+<li><a href="#section-16">附录 C 术语补充</a>
+</li>
+<li><a href="#section-17">附录 D 偏离记录与确认</a>
+</li>
+</ol></nav>
+</section>
+<section role="body" data-page-restart="1">
+<table class="executive-summary">
+<thead><tr><th>执行摘要</th></tr></thead>
+<tbody><tr><td>
+<p class="sum-p">本文档是警院 WeChat 全生态五平台中第四平台（成果展示广场）的开发依据，承接总纲第三章的全局规则与 M4 里程碑。广场是五平台闭环的第五环与唯一出口，只做四件事：展示、体验、反馈、传承。</p>
+<p class="sum-p">本次需求澄清确定三条关键决策：其一，广场对公网完全开放，作品提交即公开、不设前置人工审核，以"涉密承诺书 + 机审标记 + 2 小时响应下架"作为补偿性控制，构成对总纲 NFR-02 的正式偏离；其二，广场严格守住"展示"定位，不做关注关系、不做推荐流、不做热度榜，评分与榜单只作作品质量参考；其三，优秀作品的课例回流采用"作者授权 + 老师审批"双条件，不由系统自动流转。</p>
+<p class="sum-p">首版 P0 范围为：投稿上墙、展示墙、作品详情、体验中转页、评论点赞评分、巡查与下架、广场管理后台。榜单、搜索、版本迭代、课例回流列 P1。</p>
+<p class="sum-p">需决策层在开发启动前拍板两件事：一是总纲负责人对第九章偏离条款的书面确认（附录 D 记录确认状态）；二是非工坊来源作品的积分分值（第十三章 Q-11）。</p>
+</td></tr></tbody></table>
+
+<p class="body"><strong>警院 WeChat 全生态五平台 · 第四平台细化</strong></p>
+<h1 class="chapter" id="section-1">第一章 文档控制信息</h1>
+<table class="tbl"><thead><tr><th>项目</th><th>内容</th></tr></thead><tbody><tr><td>文档名称</td><td>警院 WeChat 全生态五平台项目需求文档（成果展示广场平台细化）</td></tr><tr><td>版本</td><td>V1.0（首版，待评审）</td></tr><tr><td>编制日期</td><td>2026-11-03</td></tr><tr><td>文档负责人</td><td>项目总负责人 / 成果展示广场平台负责人</td></tr><tr><td>上游依据</td><td>《警院 WeChat 全生态五平台项目需求文档 V1.0》（以下简称&quot;总纲&quot;）第三章、3.7 接口契约、3.9 非功能需求、3.10 里程碑 M4</td></tr><tr><td>主要读者</td><td>广场平台开发组、实训工坊负责人、自学平台负责人、指导老师与管理员、后续接手的学员</td></tr><tr><td>文档定位</td><td>广场平台的开发落地依据。本文档是广场平台的唯一实现口径，与总纲冲突时以总纲为准，本文档第九章的偏离条款除外</td></tr></tbody></table>
+<h2 id="section-1-1">1.1 章节覆盖说明</h2>
+<p class="body">本文档只覆盖总纲第四章之外的第四平台（成果展示广场）。按&quot;先定边界、再定功能、后定契约&quot;的顺序组织：</p>
+<ol class="num"><li>第二至第三章：平台定位、与总纲的边界关系、用户与权限。这部分决定后续所有功能的取舍。</li><li>第四至第五章：功能需求与业务流程，写到可直接拆任务开发的颗粒度。</li><li>第六至第七章：数据模型与跨平台接口契约，供工坊、自学平台对接使用。</li><li>第八至第九章：非功能需求与内容安全，含对总纲 NFR-02 的正式偏离声明。</li><li>第十至第十三章：页面清单、验收标准、风险与待决策事项。</li></ol>
+<h2 id="section-1-2">1.2 需求编号与优先级规则</h2>
+<p class="body">总纲已定义 GR / IF / FR / BP / NFR / AC 六类前缀。广场平台沿用该体系，但为避免与论坛平台 FR-01 至 FR-13 编号冲突，广场自有需求统一加 `SP` 前缀：</p>
+<table class="tbl"><thead><tr><th>前缀</th><th>含义</th><th>示例</th></tr></thead><tbody><tr><td>SP-FR</td><td>广场平台功能需求</td><td>SP-FR-02 展示墙与首页组织</td></tr><tr><td>SP-BP</td><td>广场平台业务流程</td><td>SP-BP-01 工坊项目推送上墙</td></tr><tr><td>SP-AC</td><td>广场平台验收标准</td><td>SP-AC-05 评分防刷</td></tr><tr><td>IF / EV / NFR / GR</td><td>沿用总纲编号，不重新起编</td><td>IF-07、EV-05、NFR-11</td></tr></tbody></table>
+<p class="body">优先级定义沿用总纲：P0 为首版必须交付，缺失则闭环断裂；P1 为首版应有，可延后一个迭代；P2 为增强项，按资源排期。</p>
+<h1 class="chapter" id="section-2">第二章 平台定位与建设目标</h1>
+<h2 id="section-2-1">2.1 平台定位</h2>
+<p class="body">成果展示广场是五平台闭环的<strong>第五环与唯一出口</strong>。它不生产内容，只做三件事：把工坊产出的项目变成可被全校看见的作品，把看见变成可沉淀的反馈，把反馈变成下一届可以接手的资产。</p>
+<p class="body">用一句话概括职责：<strong>展成果、做曝光、收反馈、做传承</strong>。</p>
+<p class="body">总纲 3.5 给广场的边界是&quot;不做开发过程管理，不重开评审&quot;。本文档在此之上补一条同等级约束：<strong>广场不做社区</strong>。具体体现为三条禁止项——不设关注与粉丝关系、不做算法推荐信息流、不做以浏览量与评论数为基础的热度排行。榜单只以&quot;作品质量&quot;为口径，不以&quot;社区活跃&quot;为口径。理由见 2.5。</p>
+<h2 id="section-2-2">2.2 在五平台闭环中的位置</h2>
+<table class="tbl"><thead><tr><th>环节</th><th>承接平台</th><th>输入广场的内容</th><th>广场的输出</th></tr></thead><tbody><tr><td>交流组队</td><td>论坛</td><td>—</td><td>作品详情页反链至作者招募帖与相关板块</td></tr><tr><td>前置学习</td><td>自学</td><td>—</td><td>优秀作品作为课例回流，反向充实课程案例</td></tr><tr><td>能力考核</td><td>考试</td><td>—</td><td>作品详情页标注作者持有的相关资格（只读展示）</td></tr><tr><td>项目生产</td><td>实训工坊</td><td>验收通过的项目与评审结论（EV-04）</td><td>作品状态回写工坊，形成项目对外展示入口</td></tr><tr><td>成果公开</td><td>成果广场</td><td>作品、体验、反馈</td><td>反馈数据回流作者与工坊</td></tr></tbody></table>
+<h2 id="section-2-3">2.3 建设目标</h2>
+<p class="body"><strong>业务目标</strong></p>
+<ul class="bullet"><li>让每一个通过验收的项目都有对外可见的落点，解决&quot;做完没人知道&quot;的问题。首版目标为工坊来源项目上墙率不低于 80%。</li><li>让低年级学员在动手之前就能看到可运行的真实作品，把&quot;看作品&quot;作为选方向、找队友、定选题的入口。</li><li>让作品产生可被使用的反馈，反馈以&quot;建议、缺陷、想参与&quot;三类归集到作者，而不是散落在聊天记录里。</li><li>让优秀作品沉淀为教学资产，通过课例回流（EV-06）进入自学平台，形成闭环自转。</li></ul>
+<p class="body"><strong>技术目标</strong></p>
+<ul class="bullet"><li>复用底座身份与权限（IF-01、IF-02），广场不自建账号体系，不维护第二套角色定义。</li><li>完全公开的浏览侧与校内受限的互动侧解耦：未登录可读，写操作一律鉴权。</li><li>与工坊、自学平台只通过接口与事件通信，不跨库读写。</li></ul>
+<h2 id="section-2-4">2.4 成功衡量指标</h2>
+<table class="tbl"><thead><tr><th>指标</th><th>首版目标值（建议）</th><th>数据来源</th></tr></thead><tbody><tr><td>工坊验收通过项目的上墙率</td><td>≥ 80%</td><td>工坊验收记录与广场作品记录比对</td></tr><tr><td>作品详情页周访问人次</td><td>学期内周均 ≥ 300</td><td>访问埋点</td></tr><tr><td>在线体验完成率（进入中转页后实际跳转）</td><td>≥ 50%</td><td>中转页埋点</td></tr><tr><td>作品获得有效反馈的比例</td><td>≥ 60% 的作品至少有 1 条评论或评分</td><td>评论与评分表</td></tr><tr><td>举报平均响应时长</td><td>≤ 2 小时</td><td>举报处置记录</td></tr><tr><td>被设为教学范例的作品数</td><td>每学期 ≥ 8 件</td><td>置顶与课例记录</td></tr></tbody></table>
+<h2 id="section-2-5">2.5 与总纲边界的确认（重要）</h2>
+<p class="body">本项目在需求澄清阶段曾考虑把广场做成&quot;含关注、热度榜、创作者主页的轻社区&quot;。经决策，<strong>不采用</strong>该方向，理由有三：</p>
+<ol class="num"><li>总纲 3.5 已明确广场&quot;不做内容社区&quot;，若广场引入关注流与热度榜，将与其职责边界冲突，也会与论坛的社交职能重叠。</li><li>完全公开场景下，热度类指标极易被刷，且无法区分校内与校外流量，作为校内评价依据不可靠。</li><li>警务类作品一旦以热度为曝光依据，会把&quot;传播性&quot;置于&quot;合规性&quot;之上，与本项目的内容安全底线相悖。</li></ol>
+<p class="body">因此本文档确定：<strong>评分与榜单只作为作品质量参考，不作为社区热度指标</strong>；排序口径见 SP-FR-09。</p>
+<h1 class="chapter" id="section-3">第三章 用户、角色与权限</h1>
+<h2 id="section-3-1">3.1 用户类型</h2>
+<table class="tbl"><thead><tr><th>用户类型</th><th>来源</th><th>登录要求</th><th>说明</th></tr></thead><tbody><tr><td>实名学生</td><td>论坛注册并审核通过</td><td>微信授权 + 统一 token</td><td>主要创作者与体验者</td></tr><tr><td>助教</td><td>由学生升级</td><td>同上</td><td>承担日常巡查、评论折叠、内容加精</td></tr><tr><td>老师</td><td>管理员开通</td><td>同上</td><td>承担置顶、下架、课例审批</td></tr><tr><td>管理员</td><td>管理员开通</td><td>同上</td><td>终审、权限与规则配置</td></tr><tr><td>校友</td><td>毕业归档后的学生账号</td><td>同上</td><td>只读浏览，可点赞不可投稿</td></tr><tr><td>校外访客</td><td>无账号</td><td>无需登录</td><td>完全公开场景下的匿名浏览者</td></tr></tbody></table>
+<h2 id="section-3-2">3.2 角色权限矩阵</h2>
+<table class="tbl"><thead><tr><th>能力</th><th>校外访客</th><th>学生</th><th>助教</th><th>老师</th><th>管理员</th><th>校友</th></tr></thead><tbody><tr><td>浏览展示墙与作品详情</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td></tr><tr><td>在线体验（跳转外链）</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td></tr><tr><td>点赞</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td></tr><tr><td>星级评分</td><td>是（仅计热度）</td><td>是（计质量榜）</td><td>是</td><td>是</td><td>是</td><td>否</td></tr><tr><td>发表评论</td><td>否</td><td>是</td><td>是</td><td>是</td><td>是</td><td>否</td></tr><tr><td>投稿上墙</td><td>否</td><td>是</td><td>是</td><td>是</td><td>是</td><td>否</td></tr><tr><td>编辑本人作品</td><td>否</td><td>本人作品</td><td>本人作品</td><td>本人作品</td><td>任意</td><td>否</td></tr><tr><td>申请下架本人作品</td><td>否</td><td>是</td><td>是</td><td>是</td><td>是</td><td>是</td></tr><tr><td>提交版本更新</td><td>否</td><td>本人作品</td><td>本人作品</td><td>本人作品</td><td>任意</td><td>否</td></tr><tr><td>折叠低质评论</td><td>否</td><td>否</td><td>是</td><td>是</td><td>是</td><td>否</td></tr><tr><td>下架作品（置为不可见）</td><td>否</td><td>否</td><td>否</td><td>是</td><td>是</td><td>否</td></tr><tr><td>置顶 / 取消置顶</td><td>否</td><td>否</td><td>否</td><td>是</td><td>是</td><td>否</td></tr><tr><td>设为教学范例</td><td>否</td><td>否</td><td>否</td><td>是</td><td>是</td><td>否</td></tr><tr><td>审批课例授权</td><td>否</td><td>否</td><td>否</td><td>是</td><td>是</td><td>否</td></tr><tr><td>发起课例授权申请</td><td>否</td><td>本人作品</td><td>本人作品</td><td>本人作品</td><td>任意</td><td>否</td></tr><tr><td>处理举报与申诉</td><td>否</td><td>否</td><td>初审</td><td>处置</td><td>终审</td><td>否</td></tr><tr><td>查看数据看板</td><td>否</td><td>否</td><td>本板块</td><td>全部</td><td>全部</td><td>否</td></tr><tr><td>导出投稿与反馈数据</td><td>否</td><td>否</td><td>否</td><td>否</td><td>是</td><td>否</td></tr></tbody></table>
+<p class="body">权限一律在服务端判定，前端隐藏入口不作为权限依据，与总纲 NFR-05 一致。</p>
+<h2 id="section-3-3">3.3 登录与身份</h2>
+<ul class="bullet"><li>广场不提供独立注册与登录页，一律通过 IF-01 校验论坛颁发的统一 token，从中取 uid、角色与权限快照。</li><li>浏览侧不强制登录：展示墙、详情页、评论列表、评分分布对访客全部可见，便于对外传播。</li><li>写操作（评论、投稿、评分、点赞、举报）在服务端做登录与角色校验；访客执行写操作时返回登录引导，不跳转空白页。</li><li>账号被冻结时，广场侧同步失权：历史作品保留展示但作者无法登录管理，处置权归管理员。</li></ul>
+<h2 id="section-3-4">3.4 访客态与校友态的特殊规则</h2>
+<ul class="bullet"><li>访客评分只写入热度计数，不进入质量参考榜，也不参与&quot;作品评分&quot;的公开展示口径（详情页展示的评分仅统计校内实名评分）。</li><li>访客不可见的内容：作者真实姓名与学号、团队成员的班级信息、工坊内部评审意见原文。这三类在任何情况下不对外暴露。</li><li>校友态账号保留浏览与点赞能力，保留本人作品的管理权（可申请下架），但不能投稿新作品，与总纲&quot;校友态只读&quot;保持一致。</li></ul>
+<h1 class="chapter" id="section-4">第四章 功能需求</h1>
+<h2 id="section-4-1">4.1 功能清单总表</h2>
+<table class="tbl"><thead><tr><th>编号</th><th>需求名称</th><th>优先级</th><th>首版是否交付</th></tr></thead><tbody><tr><td>SP-FR-01</td><td>作品投稿与上墙</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-02</td><td>展示墙与首页组织</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-03</td><td>作品详情页</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-04</td><td>在线体验与外链中转</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-05</td><td>评论与点赞</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-06</td><td>星级评分与质量参考</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-07</td><td>版本迭代与变更记录</td><td>P1</td><td>否</td></tr><tr><td>SP-FR-08</td><td>搜索与筛选</td><td>P1</td><td>否</td></tr><tr><td>SP-FR-09</td><td>质量参考榜与精选</td><td>P1</td><td>否</td></tr><tr><td>SP-FR-10</td><td>置顶与教学范例</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-11</td><td>课例回流授权</td><td>P1</td><td>否</td></tr><tr><td>SP-FR-12</td><td>内容治理与巡查</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-13</td><td>举报与申诉</td><td>P0</td><td>是</td></tr><tr><td>SP-FR-14</td><td>数据看板与埋点</td><td>P1</td><td>否</td></tr><tr><td>SP-FR-15</td><td>广场 PC 管理后台</td><td>P0</td><td>是</td></tr></tbody></table>
+<h2 id="section-4-2">4.2 SP-FR-01 作品投稿与上墙（P0）</h2>
+<p class="body">作品进入广场有两条来源通道，共用同一张作品表，但校验规则不同。</p>
+<p class="body"><strong>通道一：工坊推送</strong></p>
+<ul class="bullet"><li>工坊项目验收通过并产生 EV-04 后，工坊侧提供&quot;推送到成果广场&quot;动作，广场接收后生成作品草稿，自动带入项目名称、团队成员、技术栈、验收评分与评审结论摘要。</li><li>草稿状态的作品仅作者与管理员可见，作者补全封面图、作品简介、体验地址、源码是否公开等信息后提交，即上墙。</li><li>上墙前广场调用 IF-07 复核项目状态，状态非&quot;验收通过&quot;则拒绝上墙并回写失败原因。</li><li>同一项目重复推送时按 projectId 幂等，不产生重复作品。</li></ul>
+<p class="body"><strong>通道二：自主投稿</strong></p>
+<ul class="bullet"><li>任何人可投稿，不设学历、年级、成绩门槛。来源类型可选：工坊项目、自学课程作业、竞赛作品、个人作品。</li><li>自主投稿必须填写：作品名称、来源类型、作品简介、封面图、技术栈、参与成员（可单人）、体验地址（选填）、源码地址（选填且默认不公开）。</li><li>自主投稿不校验验收状态，但详情页必须显著标注来源类型；非工坊来源的作品统一显示&quot;未经项目验收&quot;提示，避免与工坊来源作品混淆。</li></ul>
+<p class="body"><strong>共同规则</strong></p>
+<ul class="bullet"><li>投稿前必须勾选《不含涉密与敏感信息承诺书》，勾选记录与提交时间入库留痕，见第九章。</li><li>成员与贡献权重由投稿人填写，权重合计须为 100%，用于积分分账，规则见 7.5。</li><li>作品提交后立即上墙，不进入人工审核队列，与第九章偏离条款配套的事后巡查机制承接质量与合规责任。</li><li>作者可随时编辑作品信息、提交新版本、申请下架。申请下架后即刻从公开展示中移除，后台保留记录不做物理删除。</li></ul>
+<h2 id="section-4-3">4.3 SP-FR-02 展示墙与首页组织（P0）</h2>
+<ul class="bullet"><li>首页结构自上而下为：置顶轮播位（最多 5 个，由老师或管理员配置）、分类导航、标签筛选条、作品卡片瀑布流、分页加载。</li><li>分类固定四类，与论坛板块的技术方向命名保持一致：警务 AI、数据警务、网络安全、前后端开发。分类由后台配置，可增删停用，不在前端写死。</li><li>标签为自由标签，由投稿人填写，后台可合并同义标签、屏蔽违规标签。单作品标签上限 5 个。</li><li>作品卡片至少展示：封面图、作品名称、来源类型标识、技术栈标签、团队成员（头像与昵称，不显示真实姓名）、校内评分、体验入口。</li><li>排序默认按上墙时间倒序。提供&quot;最新&quot;&quot;评分优先&quot;两种排序，不提供&quot;最热&quot;排序，避免以流量为导向。</li><li>支持按分类、标签、来源类型、是否有在线体验四个维度筛选，筛选条件可组合并写入 URL，便于分享。</li><li>移动端小程序与公开 H5 页共用同一套列表接口，分页大小与卡片结构一致。</li></ul>
+<h2 id="section-4-4">4.4 SP-FR-03 作品详情页（P0）</h2>
+<p class="body">详情页是广场的核心页面，必须在不登录的情况下完整可读。页面分区如下：</p>
+<table class="tbl"><thead><tr><th>分区</th><th>内容</th><th>可见性</th></tr></thead><tbody><tr><td>头部</td><td>封面、作品名称、来源类型、上墙时间、当前版本号</td><td>全部</td></tr><tr><td>作者区</td><td>团队成员昵称与头像、队长标识、成员公开档案入口</td><td>全部（真实姓名脱敏）</td></tr><tr><td>简介区</td><td>作品简介、解决的问题、技术方案要点、亮点说明</td><td>全部</td></tr><tr><td>技术区</td><td>技术栈标签、运行环境、源码是否公开</td><td>全部</td></tr><tr><td>体验区</td><td>在线体验入口、体验次数、演示视频（可选）</td><td>全部</td></tr><tr><td>评价区</td><td>校内评分分布、评论列表、点赞数</td><td>全部</td></tr><tr><td>评审区</td><td>验收评分、评审结论摘要（仅摘要，不含评审意见原文）</td><td>全部</td></tr><tr><td>关联区</td><td>所属工坊项目、相关论坛讨论帖、相关课程（如已回流）</td><td>全部</td></tr></tbody></table>
+<ul class="bullet"><li>页面需提供分享能力：生成带二维码的分享卡片，卡片内容为作品名称、封面与一句话简介。</li><li>对标记为&quot;教学范例&quot;的作品，头部固定展示范例标识，并在关联区展示引用它的课程。</li><li>页面底部提供一键举报入口，位置固定，不随内容滚动隐藏。</li></ul>
+<h2 id="section-4-5">4.5 SP-FR-04 在线体验与外链中转（P0）</h2>
+<ul class="bullet"><li>作品可配置一个体验地址，支持 H5 链接、可下载的演示包链接、视频演示链接三种形态，形态由作者在投稿时选择。</li><li>点击&quot;在线体验&quot;不直接跳转，先进入中转确认页，页内展示：作品名称、目标域名、一句风险提示（&quot;该作品由学员开发，内容未经平台审核，请注意账号与设备安全&quot;）、继续访问与返回两个按钮。</li><li>确认后跳转，同时记一次体验记录（uid 或访客标识、作品 id、时间戳、来源页）。中转页记录到达即计一次&quot;体验点击数&quot;，实际跳转计一次&quot;体验完成数&quot;，两个指标分开统计。</li><li>地址有效性巡检：系统每日对全部体验地址做一次可达性探测，连续 3 天不可达的作品在详情页展示&quot;体验地址暂时不可用&quot;，并在作者后台提示更新，不自动下架作品。</li><li>禁止在平台内直接内嵌渲染第三方页面，不加载第三方脚本，不做 iframe 嵌套，规避脚本注入与数据外泄风险。</li></ul>
+<h2 id="section-4-6">4.6 SP-FR-05 评论与点赞（P0）</h2>
+<ul class="bullet"><li>评论采用两级结构：一级评论 + 对一级评论的回复，更深层级折叠为&quot;查看更多回复&quot;。</li><li>评论需登录且实名，访客不可评论。评论内容支持纯文本与表情，不支持外链与富文本，降低注入与导流风险。</li><li>作者可回复评论，回复带&quot;作者&quot;标识。老师与助教的回复带&quot;教师&quot;或&quot;助教&quot;标识。</li><li>点赞为一作品一次，可取消，校内与访客点赞分开计数，页面展示合计值。</li><li>评论不做前置审核（与第九章偏离条款一致），但支持助教与老师折叠。被折叠的评论默认隐藏，显示&quot;该评论已被折叠&quot;与展开入口。</li><li>同一用户在同一作品下的评论频率限制为每分钟 3 条、每日 30 条，超限提示稍后再试。</li><li>评论区提供按&quot;最新&quot;&quot;最有帮助&quot;两种排序，&quot;最有帮助&quot;以点赞数为主、作者回复为加权。</li></ul>
+<h2 id="section-4-7">4.7 SP-FR-06 星级评分与质量参考（P0）</h2>
+<ul class="bullet"><li>评分为 1 至 5 星整数，一文一用户一评，可修改不可重复提交。修改后以最新一次为准，历史记录保留用于异常检测。</li><li>详情页展示的评分仅统计校内实名用户，展示平均值、评分人数与五档分布。访客评分只计入热度，不参与平均分计算，不进入榜单。</li><li>评分权限：校内实名用户对任意作品可评分；作者不得给自己的作品评分；同一设备同一账号 24 小时内对同一作品只计一次。</li><li>异常检测：同一 IP 段短时间内集中对同一作品给出极端评分、或新注册账号批量评分，标记为可疑并进入后台待核队列，可疑评分不计入平均分直至人工确认。</li><li>作者可对明显失实的评分发起一次复核申请，由助教或老师裁定，裁定结果不公开具体评分人信息。</li><li>单作品有效评分数少于 5 时，详情页展示&quot;评分样本不足&quot;，不展示平均分，避免小样本误导。</li></ul>
+<h2 id="section-4-8">4.8 SP-FR-07 版本迭代与变更记录（P1）</h2>
+<ul class="bullet"><li>一个项目对应一个作品页，作者可持续提交新版本。每个版本记录版本号、变更说明、提交时间、封面与体验地址快照。</li><li>详情页默认展示最新版本，提供版本时间线，可回看历史版本的简介与截图，历史版本的体验地址默认失效。</li><li>版本更新不重置评分与评论，但在评论区插入一条系统记录：&quot;作者于 X 时间发布 V2 版本&quot;，便于读者理解上下文。</li><li>版本提交频率限制为每个作品每日 1 次，避免反复刷更新位。</li></ul>
+<h2 id="section-4-9">4.9 SP-FR-08 搜索与筛选（P1）</h2>
+<ul class="bullet"><li>支持按作品名称、简介、技术栈标签、作者昵称搜索，标题与标签维度做中文分词，简介维度可按资源降级为前缀匹配。</li><li>搜索结果支持按分类、来源类型、评分区间二次筛选。</li><li>不提供按浏览量排序的搜索排序选项。</li></ul>
+<h2 id="section-4-10">4.10 SP-FR-09 质量参考榜与精选（P1）</h2>
+<p class="body">榜单的定位是&quot;作品质量参考&quot;，不是社区热度榜，因此排序口径与常规排行榜不同：</p>
+<table class="tbl"><thead><tr><th>榜单</th><th>计算口径</th><th>更新频率</th><th>说明</th></tr></thead><tbody><tr><td>评分优先</td><td>校内实名评分均值 × 评分人数权重（贝叶斯平滑）</td><td>每日</td><td>样本少于 5 不入选</td></tr><tr><td>新作精选</td><td>上墙 30 天内、评分均值 ≥ 4.5 且评分数 ≥ 5</td><td>每日</td><td>用于冷启动曝光</td></tr><tr><td>分类精选</td><td>各分类内按评分优先取前 10</td><td>每周</td><td>由助教复核后发布</td></tr></tbody></table>
+<ul class="bullet"><li>榜单不展示浏览量、评论数、点赞数作为排名依据。</li><li>不设&quot;作者榜&quot;&quot;团队榜&quot;，避免个人排名化，与总纲&quot;不做社区热度&quot;的定位一致。</li><li>所有榜单的计算方法在页面内提供可查的说明入口，符合总纲 FR-08&quot;算法必须公开可查&quot;的精神。</li></ul>
+<h2 id="section-4-11">4.11 SP-FR-10 置顶与教学范例（P0）</h2>
+<ul class="bullet"><li>置顶位由老师与管理员配置，最多 5 个，支持设置生效时间与下线时间，到期自动下线。</li><li>置顶与&quot;教学范例&quot;是两个独立标记：置顶只影响首页展示位置，教学范例影响标识展示与课例回流资格。老师可将任一作品设为教学范例，数量不限。</li><li>教学范例作品在详情页固定展示范例标识，并进入&quot;教学案例&quot;专区列表，供自学平台与老师取用。</li></ul>
+<h2 id="section-4-12">4.12 SP-FR-11 课例回流授权（P1）</h2>
+<ul class="bullet"><li>课例回流采用&quot;作者授权 + 老师审批&quot;双条件，不由系统自动流转。</li><li>流程：作者在作品管理页发起课例授权申请，勾选授权范围（仅校内教学使用、可用于公开课程、可改编）→ 老师审批 → 通过后广场调用 IF-10 在自学平台生成课程案例草稿，带入作品简介、截图、体验地址与作者署名。</li><li>授权为可分次撤回：作者可申请撤回复权，撤回后已生成的课程案例保留但不再更新，且标注&quot;原作者已撤回授权&quot;。</li><li>授权记录、审批记录、撤回记录全部入库留痕，作为知识产权争议时的依据。</li></ul>
+<h2 id="section-4-13">4.13 SP-FR-12 内容治理与巡查（P0）</h2>
+<ul class="bullet"><li>全量放行机制下，治理依靠三道防线，缺一不可：</li></ul>
+<ol class="num"><li><strong>机审标记</strong>：作品与评论提交时过敏感词与图片审核（IF-06），命中风险词或疑似涉密表述时不在前台拦截，而是打风险标签并推送至巡查队列首位。</li><li><strong>日常抽查</strong>：助教每日对新增作品按不低于 30% 的比例抽查，重点覆盖标注为警务场景、含真实数据截图、含地图与监控画面的作品。</li><li><strong>举报驱动</strong>：任何用户与访客可一键举报，举报进入队列并触发 2 小时内响应承诺。</li></ol>
+<ul class="bullet"><li>处置动作：折叠评论、下架作品（置为不可见但保留记录）、删除作品（仅管理员，需填写理由并留痕）、对作者发出整改通知。</li><li>下架不等于删除：被下架作品在作者后台显示下架原因与整改指引，整改后可申请恢复，由老师复核。</li><li>巡查记录包含巡查人、时间、结论、处置动作与理由，不可删除。</li></ul>
+<h2 id="section-4-14">4.14 SP-FR-13 举报与申诉（P0）</h2>
+<ul class="bullet"><li>举报理由分类：涉密与敏感信息、违法违规、侵犯知识产权、虚假作品（盗用他人成果）、低质与广告、其他。</li><li>举报必填：理由分类、补充说明（涉密类必填）、可选截图。举报人身份对作者不可见。</li><li>响应承诺：涉密类举报 2 小时内先行下架待核；其他类 24 小时内给出初步结论。</li><li>被处置方可发起一次申诉，由管理员终审。申诉期间处置保持生效。</li><li>举报处理结果通知举报人（不透露处置细节中的个人信息），形成闭环。</li></ul>
+<h2 id="section-4-15">4.15 SP-FR-14 数据看板与埋点（P1）</h2>
+<ul class="bullet"><li>埋点覆盖：展示墙曝光、卡片点击、详情页停留、体验点击数、体验完成数、评论提交、评分提交、收藏、分享、举报。</li><li>后台看板至少包含：作品上墙量与来源分布、体验转化漏斗（曝光 → 详情 → 中转 → 跳转）、评分分布、反馈量趋势、举报与处置时效、分类内容供给均衡度。</li><li>看板数据不对外公开，仅老师与管理员可见；助教可见本板块范围。</li><li>所有统计指标需注明口径与统计周期，避免同一指标多处口径不一致。</li></ul>
+<h2 id="section-4-16">4.16 SP-FR-15 广场 PC 管理后台（P0）</h2>
+<p class="body">管理后台独立部署，与论坛后台共享登录态但不共享界面。功能模块如下：</p>
+<table class="tbl"><thead><tr><th>模块</th><th>功能</th></tr></thead><tbody><tr><td>巡查队列</td><td>待巡作品列表、风险标签排序、一键下架与整改通知</td></tr><tr><td>作品管理</td><td>全量作品检索、编辑、置顶、设为教学范例、强制下架、恢复</td></tr><tr><td>评论治理</td><td>折叠、删除、批量处理、敏感评论回溯</td></tr><tr><td>举报与申诉</td><td>举报队列、处置、申诉终审、时效统计</td></tr><tr><td>分类与标签</td><td>分类增删启停、标签合并与屏蔽</td></tr><tr><td>课例授权</td><td>授权申请审批、撤回处理、生成课程草稿</td></tr><tr><td>数据看板</td><td>见 SP-FR-14</td></tr><tr><td>操作日志</td><td>全部管理动作留痕，只增不删</td></tr></tbody></table>
+<h1 class="chapter" id="section-5">第五章 业务流程</h1>
+<h2 id="section-5-1">5.1 SP-BP-01 工坊项目推送上墙流程</h2>
+<p class="body">工坊项目终期验收通过 → 产生 EV-04 事件 → 工坊侧点击&quot;推送到成果广场&quot; → 广场按 projectId 幂等校验，生成作品草稿并带入项目基础信息 → 通知队长补全展示信息 → 队长提交 → 广场调用 IF-07 复核验收状态 → 校验通过则上墙、写入 EV-05、触发积分分账 → 通知全体成员。</p>
+<p class="body">异常分支：IF-07 校验失败则退回草稿并提示原因；队长 7 天未补全则提醒一次，14 天未补全转为&quot;待补全&quot;归档，不占用首页展示位。</p>
+<h2 id="section-5-2">5.2 SP-BP-02 自主投稿流程</h2>
+<p class="body">作者进入投稿页 → 选择来源类型 → 填写作品信息与成员权重 → 勾选涉密承诺书 → 提交 → 机审打标签（不拦截） → 立即上墙并写入 EV-05 → 进入当日巡查队列 → 助教抽查 → 无问题则维持展示；有问题按 SP-BP-04 处置。</p>
+<h2 id="section-5-3">5.3 SP-BP-03 在线体验与反馈流程</h2>
+<p class="body">访客或学员在详情页点击&quot;在线体验&quot; → 进入中转确认页（记录体验点击数） → 确认跳转（记录体验完成数） → 返回广场 → 可选点赞、评分、评论 → 反馈通知作者 → 作者在后台查看反馈汇总并决定是否提交新版本。</p>
+<h2 id="section-5-4">5.4 SP-BP-04 巡查与下架处置流程</h2>
+<p class="body">触发源有三种：机审风险标签、助教日常抽查、用户举报。</p>
+<p class="body">任一触发 → 进入处置队列 → 助教初审 → 判定无问题则关闭并记录 → 判定有风险则按等级处置：一般问题折叠或整改通知，涉密与违法问题立即下架并上报老师 → 老师复核并决定是否删除 → 通知作者（含理由与整改指引） → 作者可申诉一次 → 管理员终审 → 全程留痕。</p>
+<h2 id="section-5-5">5.5 SP-BP-05 置顶与课例回流流程</h2>
+<p class="body">老师浏览作品 → 设为教学范例并（可选）置顶 → 通知作者 → 作者发起课例授权申请（选择授权范围） → 老师审批 → 通过则调用 IF-10 在自学平台生成课程案例草稿 → 自学平台侧老师补全教学结构后发布 → 作品详情页关联区展示&quot;已被 XX 课程引用&quot;。</p>
+<h2 id="section-5-6">5.6 SP-BP-06 毕业归档与校友态流程</h2>
+<p class="body">学生毕业 → 论坛侧账号转为校友态（总纲 3.3） → 广场同步：保留全部作品展示，作者可管理本人作品但不可投稿 → 作品继续作为传承资产保留 → 若作者申请下架，按 SP-FR-01 规则从公开展示移除、后台留档。</p>
+<h1 class="chapter" id="section-6">第六章 数据模型</h1>
+<h2 id="section-6-1">6.1 核心表清单</h2>
+<table class="tbl"><thead><tr><th>表名</th><th>用途</th><th>关键字段</th></tr></thead><tbody><tr><td>work</td><td>作品主表</td><td>workId、projectId（可空）、sourceType、title、summary、coverUrl、techStack、authorUid、teamMembers、status、isTop、isExample、scoreAvg、scoreCount、viewCount、experienceClick、experienceComplete、createdAt、publishedAt</td></tr><tr><td>work_version</td><td>作品版本</td><td>versionId、workId、versionNo、changeLog、snapshot、createdAt</td></tr><tr><td>work_media</td><td>作品素材</td><td>mediaId、workId、type（封面/截图/视频）、url、sort、auditTag</td></tr><tr><td>work_member</td><td>成员与权重</td><td>id、workId、uid、role（队长/成员）、weight、confirmed（成员是否确认权重）</td></tr><tr><td>category / tag</td><td>分类与标签</td><td>id、name、parentId、enabled、sort</td></tr><tr><td>comment</td><td>评论</td><td>commentId、workId、parentId、uid、content、status（正常/折叠/删除）、likeCount、createdAt</td></tr><tr><td>like_record</td><td>点赞</td><td>id、workId、uid 或 visitorId、createdAt</td></tr><tr><td>rating</td><td>评分</td><td>id、workId、uid、score、isSuspicious、createdAt、updatedAt</td></tr><tr><td>experience_log</td><td>体验记录</td><td>id、workId、uid 或 visitorId、stage（点击/完成）、referrer、createdAt</td></tr><tr><td>report</td><td>举报</td><td>reportId、targetType、targetId、reasonType、detail、reporterUid 或 visitorId、status、handledBy、handledAt</td></tr><tr><td>audit_record</td><td>巡查与处置</td><td>auditId、targetType、targetId、source（机审/抽查/举报）、riskTag、conclusion、action、operator、reason、createdAt</td></tr><tr><td>case_license</td><td>课例授权</td><td>licenseId、workId、uid、scope、status、approvedBy、approvedAt、revokedAt</td></tr><tr><td>operation_log</td><td>操作日志</td><td>id、uid、action、objectType、objectId、ip、device、createdAt（只增不删）</td></tr></tbody></table>
+<h2 id="section-6-2">6.2 建模约束</h2>
+<ul class="bullet"><li>`work.scoreAvg` 与 `work.scoreCount` 为冗余字段，仅统计校内实名评分，由评分服务异步重算，每日对账一次。</li><li>`work.experienceClick` 与 `work.experienceComplete` 分开计数，不可互相推导。</li><li>全部涉及访客的表用 `visitorId`（浏览器指纹 + 本地标识）记录，不用 uid 伪造。</li><li>删除一律为软删除，`status` 置为对应终态，不执行物理删除。</li></ul>
+<h1 class="chapter" id="section-7">第七章 接口与集成</h1>
+<h2 id="section-7-1">7.1 复用的底座接口</h2>
+<table class="tbl"><thead><tr><th>编号</th><th>接口</th><th>广场用途</th></tr></thead><tbody><tr><td>IF-01</td><td>单点登录鉴权</td><td>校验 token，取 uid 与角色</td></tr><tr><td>IF-02</td><td>用户与角色查询</td><td>取作者昵称、头像、公开档案链接</td></tr><tr><td>IF-03</td><td>积分账户服务</td><td>作品上墙后发起加分事件</td></tr><tr><td>IF-05</td><td>消息通知服务</td><td>审核结果、评论、举报、置顶、课例审批通知</td></tr><tr><td>IF-06</td><td>内容审核服务</td><td>作品与评论的机审打标</td></tr><tr><td>IF-07</td><td>队伍与项目状态查询</td><td>上墙前复核验收状态</td></tr></tbody></table>
+<h2 id="section-7-2">7.2 广场新增接口</h2>
+<table class="tbl"><thead><tr><th>编号</th><th>接口</th><th>方向</th><th>说明</th></tr></thead><tbody><tr><td>IF-08</td><td>作品列表与详情查询</td><td>广场 → 全部平台</td><td>按 uid、projectId 或分类查询，只读，供个人档案与论坛引用</td></tr><tr><td>IF-09</td><td>作品状态回写</td><td>广场 → 工坊</td><td>上墙、下架、版本更新时回写作品状态，供工坊项目页展示</td></tr><tr><td>IF-10</td><td>课例转化受理</td><td>广场 → 自学</td><td>传入作品快照与授权范围，生成课程案例草稿，返回草稿 id</td></tr><tr><td>IF-11</td><td>作品统计查询</td><td>广场 → 全部平台</td><td>按 uid 汇总作品数、评分均值、体验量，供成长档案归集</td></tr><tr><td>IF-12</td><td>涉密线索同步</td><td>广场 → 管理员告警通道</td><td>涉密举报即时推送，供值班人员响应</td></tr></tbody></table>
+<h2 id="section-7-3">7.3 事件定义</h2>
+<table class="tbl"><thead><tr><th>编号</th><th>事件</th><th>触发时机</th><th>关键字段</th><th>下游动作</th></tr></thead><tbody><tr><td>EV-05</td><td>作品发布</td><td>作品首次上墙或版本更新</td><td>eventId、workId、projectId、authorUids、sourceType、versionNo、occurredAt</td><td>加分、档案写入、工坊状态回写</td></tr><tr><td>EV-06</td><td>作品被设为教学课例</td><td>课例授权审批通过</td><td>eventId、workId、courseId、licenseScope、occurredAt</td><td>自学平台生成案例草稿、完成生态闭环</td></tr></tbody></table>
+<p class="body">事件通用字段与幂等要求沿用总纲 3.7：eventId 全局唯一作为幂等键，消费方按 eventId 去重，事件必须可重放。</p>
+<h2 id="section-7-4">7.4 失败处理</h2>
+<ul class="bullet"><li>事件消费失败进入重试队列，按 1 分钟、5 分钟、30 分钟三次退避重试，仍失败则告警并落死信表。</li><li>加分失败不影响作品上墙，积分事件单独补偿，不允许因为积分服务不可用阻塞发布。</li><li>IF-10 调用失败时，课例授权状态置为&quot;授权通过但未生成&quot;，后台提供手动重试入口。</li></ul>
+<h2 id="section-7-5">7.5 贡献权重与积分分账</h2>
+<ul class="bullet"><li>权重由投稿人在提交时填写，各成员占比合计必须为 100%，队长默认不低于 10%。</li><li>提交后系统向每位成员推送确认通知，成员可确认或提出异议。有异议时作品照常展示，但积分暂不计发，直至老师裁定。</li><li>分账规则：工坊来源作品按总纲 +40 分总额按权重分配；非工坊来源作品建议按 +15 分计发，且同一作者每周最多计分 1 件，防止以量刷分。非工坊来源的分值属建议值，列入第十三章待决策。</li><li>权重确认记录与裁定记录入库留痕，作为积分争议依据。</li></ul>
+<h1 class="chapter" id="section-8">第八章 非功能需求</h1>
+<table class="tbl"><thead><tr><th>编号</th><th>类别</th><th>要求</th></tr></thead><tbody><tr><td>NFR-11</td><td>性能</td><td>展示墙列表接口 P95 ≤ 800ms，作品详情首屏 ≤ 1.5s；按全校 500 并发浏览设计；图片走压缩与缓存，封面图单张不超过 300KB</td></tr><tr><td>NFR-12</td><td>可用性</td><td>浏览链路日可用率 ≥ 99.5%；体验地址不可达不影响主站；单作品异常不阻塞列表渲染</td></tr><tr><td>NFR-13</td><td>兼容</td><td>微信客户端近两个大版本；公开 H5 页支持 Chrome、Edge、Safari 最新两个版本与主流移动端浏览器；PC 后台支持 Chrome、Edge 最新两个版本</td></tr><tr><td>NFR-14</td><td>安全</td><td>全部写操作服务端鉴权；富文本一律转义输出，禁止直接渲染用户提交的 HTML；体验地址做协议白名单（仅 http/https），拦截 javascript: 与 data: 协议</td></tr><tr><td>NFR-15</td><td>数据安全</td><td>作品与评论中的作者真实姓名、学号、班级不得出现在公开接口返回中；对外接口只返回昵称与脱敏信息</td></tr><tr><td>NFR-16</td><td>防刷与限流</td><td>评论、评分、点赞、举报均按用户与 IP 双维度限流；评分异常集中触发进入待核队列；举报接口限流防止恶意举报打垮内容</td></tr><tr><td>NFR-17</td><td>备份与恢复</td><td>作品数据与评论每日全量备份，保留 30 天；媒体文件与业务库分开备份；上线前完成一次恢复演练</td></tr><tr><td>NFR-18</td><td>可维护与交接</td><td>接口文档、部署文档、数据库变更脚本、版本迭代说明四项齐备，非原作者可在 1 天内完成本地部署，与总纲 NFR-10 同标准</td></tr><tr><td>NFR-19</td><td>可扩展</td><td>分类、标签、来源类型均后台可配，新增分类不改代码；新增作品形态（如 3D 演示、硬件演示）通过扩展 media 类型实现，不改主表结构</td></tr><tr><td>NFR-20</td><td>归档与留存</td><td>毕业作品与教学范例作品长期保留；下架作品后台保留不少于 3 年；操作日志与处置留痕不设过期删除</td></tr></tbody></table>
+<h1 class="chapter" id="section-9">第九章 内容安全与合规（含 NFR-02 偏离声明）</h1>
+<h2 id="section-9-1">9.1 偏离事项</h2>
+<p class="body">总纲 NFR-02 规定&quot;全部用户生成内容先过敏感词与图片审核，再按策略决定先发后审或先审后发，警务类、涉密类内容一律先审后发&quot;。</p>
+<p class="body">广场平台<strong>不完全适用</strong>该条：本平台确定采用&quot;全量放行、事后巡查&quot;策略，作品与评论提交后立即公开，不设前置人工审核。偏离范围为 NFR-02 中&quot;警务类、涉密类内容一律先审后发&quot;的强制要求，其余部分（敏感词与图片审核必须执行、审核日志不可删除）继续适用。</p>
+<p class="body">偏离理由：广场定位为成果展示窗口，作品上墙具有时效性与传播诉求，前置审核会在学期末集中交付期形成积压，导致作品长期不可见，闭环出口失效。因此以&quot;提交即公开 + 强追溯 + 快响应&quot;替代&quot;先审后发&quot;。</p>
+<h2 id="section-9-2">9.2 补偿性控制（偏离的生效前提）</h2>
+<p class="body">以下五项必须全部实现，缺任一项则本偏离条款自动失效，恢复为 NFR-02 原要求：</p>
+<ol class="num"><li><strong>涉密承诺书</strong>：投稿前强制勾选，内容含&quot;本作品不含国家秘密、警务工作秘密、未脱敏的真实警情与人口数据、可识别的监控画面与地理坐标&quot;，勾选人、时间、IP 入库留痕，可追溯到具体责任人。</li><li><strong>机审必过</strong>：敏感词与图片审核必须执行，命中高风险词的作品打标置顶至巡查队列，并在详情页对校内用户展示&quot;内容待核&quot;提示。</li><li><strong>2 小时响应</strong>：涉密类举报 2 小时内先行下架待核，超时未处理计入运营考核。</li><li><strong>可追溯</strong>：所有投稿、编辑、评论、举报、处置行为留痕，日志不可删除，满足 NFR-04 的实名可追溯要求。</li><li><strong>校方红线清单</strong>：上线前取得校方提供的警务内容红线清单，并据此维护敏感词库。</li></ol>
+<h2 id="section-9-3">9.3 责任主体</h2>
+<p class="body">内容安全的最终责任人为平台管理员，日常巡查责任人为助教，涉密判定与终审责任人为指导老师。三者职责不得由同一人兼任。</p>
+<h2 id="section-9-4">9.4 需确认事项</h2>
+<p class="body">本偏离条款需提交总纲负责人书面确认后方可生效，确认结果记入附录 D。在确认前，广场按&quot;仅工坊来源免审、非工坊来源人工审核&quot;的过渡策略上线，待确认后切换为全量放行。</p>
+<h1 class="chapter" id="section-10">第十章 页面清单</h1>
+<p class="body"><strong>学员端（小程序 + 公开 H5）</strong></p>
+<p class="body">展示墙首页、分类列表页、搜索结果页、作品详情页、体验中转确认页、评论列表页、投稿页、我的作品页（含版本管理）、作品编辑页、反馈汇总页、举报页、消息通知页。</p>
+<p class="body"><strong>公开访问侧（免登录）</strong></p>
+<p class="body">展示墙首页、作品详情页、体验中转页、教学案例专区。四个页面均支持分享与二维码。</p>
+<p class="body"><strong>PC 管理后台</strong></p>
+<p class="body">登录页、巡查队列、作品管理、评论治理、举报与申诉、分类与标签、置顶与教学范例、课例授权审批、数据看板、操作日志。</p>
+<h1 class="chapter" id="section-11">第十一章 验收标准</h1>
+<table class="tbl"><thead><tr><th>编号</th><th>验收项</th><th>标准</th></tr></thead><tbody><tr><td>SP-AC-01</td><td>上墙链路</td><td>工坊推送生成草稿并带入项目信息；IF-07 校验失败时拒绝上墙；同项目重复推送不产生重复作品</td></tr><tr><td>SP-AC-02</td><td>自主投稿</td><td>无门槛投稿成功；非工坊来源详情页正确展示&quot;未经项目验收&quot;标识；承诺书勾选记录可查</td></tr><tr><td>SP-AC-03</td><td>公开访问</td><td>未登录状态下展示墙、详情页、评论列表、评分分布全部可见；访客评论被服务端拒绝</td></tr><tr><td>SP-AC-04</td><td>体验中转</td><td>点击体验先进中转页；确认后跳转并分别记录点击数、完成数；javascript: 协议地址被拦截</td></tr><tr><td>SP-AC-05</td><td>评分防刷</td><td>同一账号重复评分不重复计数；作者不能给自己评分；少于 5 个评分不展示均分；可疑评分不计入均值</td></tr><tr><td>SP-AC-06</td><td>榜单口径</td><td>榜单不含浏览量、评论数、点赞数作为排序依据；算法说明页可访问</td></tr><tr><td>SP-AC-07</td><td>版本迭代</td><td>V2 提交后详情页默认展示最新版本，历史版本可回看，评论区出现系统记录</td></tr><tr><td>SP-AC-08</td><td>巡查处置</td><td>机审风险作品进入队列首位；下架后前台不可见、作者后台可见原因并可申请恢复；处置记录不可删除</td></tr><tr><td>SP-AC-09</td><td>举报时效</td><td>涉密类举报 2 小时内完成下架待核；其他类 24 小时内给出结论</td></tr><tr><td>SP-AC-10</td><td>课例回流</td><td>作者授权 + 老师审批双条件齐备才调用 IF-10；撤回授权后课程案例标注撤回状态</td></tr><tr><td>SP-AC-11</td><td>积分分账</td><td>按权重分配且合计等于总额；成员未确认时不计发；非工坊来源每周只计 1 件</td></tr><tr><td>SP-AC-12</td><td>隐私与越权</td><td>公开接口不返回真实姓名、学号、班级；越权改他人作品、越权处置、越权看板全部被服务端拒绝</td></tr></tbody></table>
+<h1 class="chapter" id="section-12">第十二章 依赖与风险</h1>
+<table class="tbl"><thead><tr><th>编号</th><th>风险或依赖</th><th>影响</th><th>应对</th></tr></thead><tbody><tr><td>R-1</td><td>全量放行策略与总纲 NFR-02 冲突，需总纲负责人书面确认</td><td>未确认前无法按设计上线</td><td>先按过渡策略上线，确认后切换；偏离条款写明自动失效条件</td></tr><tr><td>R-2</td><td>完全公开导致涉密内容外泄，属本项目最高风险</td><td>可能被要求整体下架</td><td>承诺书 + 机审 + 2 小时响应 + 校方红线清单四件套；先小范围灰度公开</td></tr><tr><td>R-3</td><td>全开放投稿且无门槛，易产生大量低质作品稀释展示墙</td><td>展示质量下降，学员失去浏览动力</td><td>巡查抽查 + 低质折叠 + 榜单只按质量口径，不按数量激励</td></tr><tr><td>R-4</td><td>体验外链大面积失效</td><td>体验转化率虚高、用户挫败</td><td>每日巡检 + 状态提示 + 作者提醒，不自动下架</td></tr><tr><td>R-5</td><td>课例回流依赖自学平台改造 IF-10</td><td>M4 交付受阻</td><td>接口先行冻结并提供 Mock；未对接前该功能标 P1，不阻塞 M4 验收</td></tr><tr><td>R-6</td><td>积分分账涉及成员利益，权重争议</td><td>团队内部矛盾、申诉量上升</td><td>权重需成员确认、有异议走老师裁定、全程留痕</td></tr><tr><td>R-7</td><td>广场与论坛功能趋同（评论、评分、榜单）</td><td>重复建设、边界模糊</td><td>本文档 2.5 明确三条禁止项；评审时以此为边界裁决依据</td></tr></tbody></table>
+<h1 class="chapter" id="section-13">第十三章 待决策事项</h1>
+<table class="tbl"><thead><tr><th>编号</th><th>待决策事项</th><th>选项与影响</th></tr></thead><tbody><tr><td>Q-11</td><td>非工坊来源作品的积分分值定多少</td><td>建议 +15 且每周限 1 件；若与工坊来源同为 +40，会激励刷量投稿，需明确取舍</td></tr><tr><td>Q-12</td><td>完全公开是否设置&quot;延迟公开&quot;缓冲</td><td>建议上墙后 24 小时内仅校内可见，24 小时后转公开，给巡查留出窗口；若直接公开则响应压力全压在举报侧</td></tr><tr><td>Q-13</td><td>访客评分是否计入&quot;体验热度&quot;以外的展示</td><td>当前方案只计热度不展示；若希望访客参与感更强，需重新设计防刷方案</td></tr><tr><td>Q-14</td><td>教学范例的评选标准由谁制定</td><td>决定 SP-FR-10 是否需要一套评分细则，否则范例易变为人情置顶</td></tr></tbody></table>
+<h1 class="chapter" id="section-14">附录 A 与总纲的对应关系</h1>
+<table class="tbl"><thead><tr><th>总纲条目</th><th>本文档承接位置</th><th>说明</th></tr></thead><tbody><tr><td>GR-01 一号通</td><td>3.3</td><td>只消费 IF-01、IF-02，不自建账号</td></tr><tr><td>GR-02 数据互通</td><td>7.2、7.3</td><td>新增 IF-08 至 IF-12，EV-05、EV-06 细化</td></tr><tr><td>GR-03 流程强绑定</td><td>4.2、5.1</td><td>工坊来源上墙前调用 IF-07 复核</td></tr><tr><td>3.5 平台边界</td><td>2.1、2.5</td><td>补充&quot;广场不做社区&quot;三条禁止项</td></tr><tr><td>3.7 IF-06/IF-07</td><td>7.1</td><td>直接复用</td></tr><tr><td>3.9 NFR-01 至 NFR-10</td><td>第八章</td><td>续编 NFR-11 至 NFR-20，不与原编号冲突</td></tr><tr><td>3.10 M4</td><td>4.1</td><td>P0 范围即 M4 交付范围</td></tr><tr><td>Q-10 课例回流责任人</td><td>4.12、5.5</td><td>定为&quot;作者授权 + 老师审批&quot;，已闭环</td></tr></tbody></table>
+<h1 class="chapter" id="section-15">附录 B 本文档假设清单</h1>
+<p class="body">以下为编制时做出的假设，任一不成立需同步调整对应章节：</p>
+<ul class="bullet"><li>广场独立部署，与论坛、工坊、自学平台各自独立，只通过 IF 接口通信（对应总纲 3.1）。</li><li>作品分类复用论坛板块的技术方向命名，不另造分类体系（对应 4.3）。</li><li>评论沿用论坛两级结构，处置动作沿用论坛 FR-09 的折叠、删除、禁言（对应 4.6、4.13）。</li><li>移动端为小程序页，PC 后台承载巡查与策展（对应总纲 3.8 端划分）。</li><li>自学平台已具备接收课例草稿的能力，IF-10 可在 M4 前完成联调（对应 R-5）。</li><li>校友态账号的权限边界沿用总纲 3.3，广场只做继承不做扩展（对应 3.4）。</li></ul>
+<h1 class="chapter" id="section-16">附录 C 术语补充</h1>
+<table class="tbl"><thead><tr><th>术语</th><th>含义</th></tr></thead><tbody><tr><td>上墙</td><td>作品进入展示墙并对公网可见的动作</td></tr><tr><td>中转页</td><td>点击在线体验后、跳转外链前的确认页面，用于风险提示与计数</td></tr><tr><td>质量参考榜</td><td>以校内评分与样本量为口径的榜单，区别于以流量为口径的热度榜</td></tr><tr><td>教学范例</td><td>由老师标记的优秀作品，具备课例回流资格</td></tr><tr><td>贡献权重</td><td>团队成员在该作品中的贡献占比，用于积分分账</td></tr><tr><td>事后巡查</td><td>内容先公开、再由助教与老师抽查处置的治理模式</td></tr><tr><td>软删除</td><td>仅改变状态、不清除数据的删除方式，用于保留追溯依据</td></tr></tbody></table>
+<h1 class="chapter" id="section-17">附录 D 偏离记录与确认</h1>
+<table class="tbl"><thead><tr><th>项目</th><th>内容</th></tr></thead><tbody><tr><td>偏离条款</td><td>对总纲 NFR-02&quot;警务类、涉密类内容一律先审后发&quot;的适用除外</td></tr><tr><td>提出方</td><td>成果展示广场平台负责人</td></tr><tr><td>提出日期</td><td>2026-11-03</td></tr><tr><td>补偿性控制</td><td>见 9.2 五项</td></tr><tr><td>生效条件</td><td>总纲负责人书面确认</td></tr><tr><td>确认状态</td><td>待确认</td></tr><tr><td>确认人 / 日期</td><td>—</td></tr></tbody></table>
+</section>
+</body>
+</html>

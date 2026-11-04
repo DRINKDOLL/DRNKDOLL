@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Halo 2.27.2 中文化实例 · 环境复现与验收报告</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#111827; --ink-2:#4b5563; --ink-3:#6b7280;
+    --line:#e5e7eb; --brand:#1f6feb; --brand-soft:#eaf2ff; --ok:#0f7b4f; --ok-soft:#e8f6ef;
+    --warn:#8a5a00; --warn-soft:#fdf3e2; --code:#0f172a; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.75;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 72px}
+  header.hero{background:linear-gradient(160deg,#0b1220 0%,#15243d 55%,#1b3555 100%);color:#fff;padding:56px 0 48px;margin-bottom:32px}
+  header.hero .wrap{padding-bottom:0}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#9db4d6;border:1px solid rgba(255,255,255,.22);padding:5px 12px;border-radius:999px}
+  h1{font-size:34px;line-height:1.3;margin:18px 0 10px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:#c3d2e8;font-size:15.5px;max-width:760px;margin:0}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#dbe7f7;
+    padding:6px 12px;border-radius:999px;font-size:13px;font-variant-numeric:tabular-nums}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-bottom:20px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h2{font-size:20px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  h2 .num{font-size:12px;font-weight:700;color:var(--brand);background:var(--brand-soft);border-radius:8px;padding:3px 9px;font-variant-numeric:tabular-nums}
+  h3{font-size:15.5px;margin:22px 0 8px;font-weight:650}
+  p{margin:10px 0;color:var(--ink-2)}
+  .lead{color:var(--ink-2);font-size:14.5px;margin:6px 0 18px}
+  table{width:100%;border-collapse:collapse;font-size:13.6px;margin:12px 0}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#fafbfc;color:var(--ink-3);font-weight:650;font-size:12.5px;letter-spacing:.02em}
+  tbody tr:last-child td{border-bottom:none}
+  code{background:#f2f4f7;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12.6px;
+    font-family:"JetBrains Mono","Cascadia Code",Consolas,monospace;color:#0f172a}
+  pre{background:var(--code);color:#d7e2f5;padding:16px 18px;border-radius:12px;overflow:auto;font-size:12.8px;line-height:1.7;
+    font-family:"JetBrains Mono","Cascadia Code",Consolas,monospace}
+  pre .c{color:#7c8ba3}
+  pre .k{color:#7dd3a0}
+  .grid{display:grid;gap:14px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:#fcfcfd}
+  .stat .n{font-size:26px;font-weight:750;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+  .stat .l{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:3px 10px;border-radius:999px;font-weight:600}
+  .badge.ok{background:var(--ok-soft);color:var(--ok)}
+  .badge.warn{background:var(--warn-soft);color:var(--warn)}
+  .checks{list-style:none;padding:0;margin:10px 0}
+  .checks li{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .checks li:last-child{border-bottom:none}
+  .tick{flex:0 0 18px;color:var(--ok);font-weight:700}
+  .tick.x{color:#b42318}
+  .muted{color:var(--ink-3);font-size:13px}
+  figure{margin:14px 0 0}
+  figure img{width:100%;border:1px solid var(--line);border-radius:12px;display:block;background:#fff}
+  figcaption{font-size:12.5px;color:var(--ink-3);margin-top:8px}
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .callout{border-left:3px solid var(--brand);background:var(--brand-soft);border-radius:0 10px 10px 0;padding:12px 16px;font-size:13.6px;color:#1e3a63;margin:14px 0}
+  .callout.warn{border-color:#d99b00;background:var(--warn-soft);color:#6b4700}
+  footer{color:var(--ink-3);font-size:12.8px;text-align:center;padding:8px 0 0}
+  @media (max-width:820px){
+    .g3,.g2,.shots{grid-template-columns:1fr}
+    h1{font-size:26px}
+    .card{padding:20px}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">基座验证 · 项目一 Halo</span>
+    <h1>Halo 2.27.2 中文化实例：环境复现与验收报告</h1>
+    <p class="sub">固定版本、固定参数、固定数据目录，从空目录一键重建同一套中文界面；界面语言不随浏览器语言变化。</p>
+    <div class="hero-meta">
+      <span class="chip">Halo 2.27.2</span>
+      <span class="chip">OpenJDK 21.0.13.0.2+1</span>
+      <span class="chip">内嵌 H2</span>
+      <span class="chip">端口 8092</span>
+      <span class="chip" id="meta-time">验收时间加载中…</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="card">
+    <h2><span class="num">00</span>结论</h2>
+    <p>Halo 自身的中文翻译是完整的：控制台随包提供 zh-CN，默认主题 <code>theme-earth</code> 的 54 条语言键全部有中文译文，页脚版权句在 2.27.2 中已是中文。因此本次工作不是“翻译词条”，而是把<strong>默认英文的配置层文案、示例内容和语言策略</strong>收敛到中文，并把这套状态固化成可重复执行的脚本。</p>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="stat"><div class="n" id="stat-pass">—</div><div class="l">自动化检查项（应全部通过）</div></div>
+      <div class="stat"><div class="n">6</div><div class="l">中文化改动点</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">需改动的前端源码文件</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">01</span>运行环境与依赖</h2>
+    <p class="lead">受限于本机没有 Docker、没有系统级 JDK、WSL 被安全策略禁用，采用“便携运行时 + 官方 fat jar + 内嵌 H2”的纯进程方案，不依赖容器与外部数据库。</p>
+    <table>
+      <thead><tr><th style="width:22%">组件</th><th style="width:30%">版本 / 形态</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>操作系统</td><td>Windows 10/11 x64</td><td>进程级隔离，无容器</td></tr>
+        <tr><td>JDK</td><td>Microsoft OpenJDK 21.0.13.0.2+1 LTS</td><td>解压即用，不写注册表、不改 PATH</td></tr>
+        <tr><td>Halo</td><td>2.27.2（<code>halo-2.27.2.jar</code>，129 MB）</td><td>SHA-256 <code>aa86f2e9…7348d14</code>，与官方发布一致</td></tr>
+        <tr><td>数据库</td><td>内嵌 H2（文件模式）</td><td>随 jar 自带，位于 <code>workdir/db</code></td></tr>
+        <tr><td>监听地址</td><td><code>127.0.0.1:8092</code></td><td>仅本机可访问</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">版本并非随手选：2.27.2 已覆盖此前复现的三类问题——UC 附件 SSRF（≤2.24.0）、备份路径穿越（≤2.24.2）、角色委派提权（≤2.26.1）。用修复版做演示基座，避免把已知漏洞带进方案。</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">02</span>启动流程</h2>
+    <pre><span class="c"># 一条命令：预检 → 启动 → 站点中文化 → 主题中文化 → 重启 → 验收</span>
+cd output/plaza-20261103/halo-cn
+./bootstrap.sh
+
+<span class="c"># 从空目录重建（验证可复现性）</span>
+./reset.sh &amp;&amp; ./bootstrap.sh</pre>
+    <p>脚本执行五步，任一步失败即中止并打印原因：</p>
+    <table>
+      <thead><tr><th style="width:16%">步骤</th><th style="width:30%">动作</th><th>校验 / 说明</th></tr></thead>
+      <tbody>
+        <tr><td>1 预检</td><td>检查 JDK 版本、jar 校验和、端口占用</td><td>JDK 必须为 21；SHA-256 不匹配直接退出</td></tr>
+        <tr><td>2 启动</td><td>固定 JVM 参数启动 jar</td><td>探活 <code>/system/setup</code>，200/302 视为就绪</td></tr>
+        <tr><td>3 站点中文化</td><td>初始化安装 + 站点标识 + 语言 + 管理员名 + 示例文章</td><td>全部幂等，重复执行只收敛状态</td></tr>
+        <tr><td>4 主题中文化</td><td>扫描主题模板中的硬编码英文并替换</td><td>2.27.2 默认主题已无英文，脚本作为升级兜底</td></tr>
+        <tr><td>5 重启并验收</td><td>模板有改动才重启，随后跑 8 项断言</td><td>结果写入 <code>run/verify.json</code></td></tr>
+      </tbody>
+    </table>
+    <h3>两个必须绕开的坑</h3>
+    <table>
+      <thead><tr><th style="width:34%">现象</th><th style="width:33%">原因</th><th>处理</th></tr></thead>
+      <tbody>
+        <tr><td>启动报 <code>Port 62406 already in use</code></td><td>宿主预设 <code>SERVER__PORT</code>，Spring 松散绑定会让环境变量覆盖配置文件</td><td>启动时 <code>env -u SERVER__PORT</code> 清除，并用 <code>--server.port</code> 命令行参数固定（优先级最高）</td></tr>
+        <tr><td>探活失败、<code>curl 127.0.0.1</code> 返回 502</td><td>宿主设置了 <code>HTTP_PROXY</code>，本机请求被转发到代理</td><td>导出 <code>NO_PROXY=127.0.0.1,localhost</code>，脚本内 curl 统一 <code>--noproxy '*'</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">03</span>关键配置</h2>
+    <p>唯一配置源 <code>config/application.yaml</code>，通过 <code>--spring.config.additional-location</code> 加载，不使用任何隐式默认值：</p>
+<pre>server:
+  port: 8092
+halo:
+  external-url: http://127.0.0.1:8092
+  work-dir: ./workdir
+  security:
+    basic-auth:
+      disabled: false      <span class="c"># 仅本地脚本化调用 API；生产必须关闭</span>
+spring:
+  web:
+    locale: zh_CN
+logging:
+  file:
+    name: ./run/halo.log</pre>
+    <p class="muted">JVM 参数固定：<code>-Xms256m -Xmx1200m -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Duser.language=zh -Duser.country=CN -Duser.timezone=Asia/Shanghai</code></p>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">04</span>中文化改动清单</h2>
+    <p class="lead">遵循“配置层优先、模板层兜底、源码层不动”的顺序，功能与布局全部保持原样。</p>
+    <table>
+      <thead><tr><th style="width:14%">层次</th><th style="width:24%">改动前</th><th style="width:26%">改动后</th><th>实现方式</th></tr></thead>
+      <tbody>
+        <tr><td>系统语言</td><td>随浏览器变化</td><td>锁定简体中文</td><td>安装参数 <code>language=zh-CN</code> + <code>systemconfigs/basic.language</code></td></tr>
+        <tr><td>站点标题</td><td>Halo SSRF Lab</td><td>警院成果展示广场</td><td><code>systemconfigs/basic.title</code></td></tr>
+        <tr><td>站点副标题</td><td>（空）</td><td>警务技术实训成果的展示、体验与反馈</td><td><code>systemconfigs/basic.subtitle</code></td></tr>
+        <tr><td>管理员显示名</td><td>Administrator</td><td>管理员</td><td><code>users/admin.spec.displayName</code>（口令字段原样回传）</td></tr>
+        <tr><td>示例文章</td><td>Hello Halo / 正文小标题 Hello Halo</td><td>你好，Halo</td><td>文章 <code>spec.title</code> + 快照正文改写后重新发布</td></tr>
+        <tr><td>页脚版权</td><td>All Rights Reserved. Powered by</td><td>版权所有，保留所有权利。技术支持：</td><td>2.27.2 主题已内置中文；脚本保留替换逻辑用于旧版/其他主题</td></tr>
+      </tbody>
+    </table>
+
+    <h3>术语统一表</h3>
+    <table>
+      <thead><tr><th style="width:30%">英文</th><th style="width:24%">统一译法</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>Post / Posts</td><td>文章</td><td>不译作“帖子”，与社区帖区分</td></tr>
+        <tr><td>Page / Pages</td><td>页面</td><td>单页，与文章区分</td></tr>
+        <tr><td>Category / Tag</td><td>分类 / 标签</td><td>分类是树，标签是平行集合</td></tr>
+        <tr><td>Attachment</td><td>附件</td><td></td></tr>
+        <tr><td>Theme / Plugin</td><td>主题 / 插件</td><td></td></tr>
+        <tr><td>Comment / Reply</td><td>评论 / 回复</td><td>回复是评论的下级</td></tr>
+        <tr><td>Dashboard / Console</td><td>仪表盘 / 控制台</td><td>Console 特指后台入口</td></tr>
+        <tr><td>Backup / Migration</td><td>备份 / 迁移</td><td></td></tr>
+      </tbody>
+    </table>
+    <p class="muted">保留原文：<code>Halo</code>、<code>GitHub</code>、<code>Markdown</code>、<code>RSS</code>、<code>API</code>、<code>URL</code>、<code>QQ</code>、<code>WeChat</code>，以及语言切换器中的 English / Español / 繁體中文（按母语显示是刻意设计）。</p>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">05</span>验收结果</h2>
+    <p class="lead">8 项自动化断言，全部基于运行中的实例实时读取，不是静态截图。</p>
+    <ul class="checks" id="checks">
+      <li><span class="tick">·</span><span>正在读取 run/verify.json …</span></li>
+    </ul>
+    <div class="callout">浏览器语言无关性单独验证：用 <code>en-US</code> 且 <code>Accept-Language: en-US</code> 的浏览器上下文访问，前台、控制台登录页、仪表盘、设置页均为中文。</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">06</span>界面实拍</h2>
+    <p class="lead">以下截图均在英文浏览器上下文中取得，可证明界面语言由服务端配置决定，而非浏览器语言。</p>
+    <div class="shots">
+      <figure><img src="shots/01-首页.png" alt="首页" /><figcaption>前台首页：导航、站点标题、副标题、文章卡片均为中文</figcaption></figure>
+      <figure><img src="shots/02-文章详情.png" alt="文章详情" /><figcaption>文章详情：标题与正文已中文化，评论区、目录、侧栏完整保留</figcaption></figure>
+      <figure><img src="shots/03-控制台登录.png" alt="控制台登录" /><figcaption>控制台登录页：账号 / 密码 / 保持登录会话 / 返回网站</figcaption></figure>
+      <figure><img src="shots/04-控制台仪表盘.png" alt="控制台仪表盘" /><figcaption>控制台仪表盘：内容、外观、系统、用户四大分组全部中文</figcaption></figure>
+    </div>
+    <figure style="grid-column:1/-1"><img src="shots/05-控制台设置.png" alt="控制台设置" /><figcaption>控制台设置页：基本设置 / 文章设置 / SEO 设置 / 首选语言 = 简体中文</figcaption></figure>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">07</span>边界与已知限制</h2>
+    <table>
+      <thead><tr><th style="width:26%">事项</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>控制台前端</td><td>打包在 jar 内（<code>console/</code> 静态资源），外部无法逐字修改；实测 2.27.2 已在 <code>en-US</code> 下降级为中文，无需干预</td></tr>
+        <tr><td>品牌与技术专名</td><td><code>Halo</code>、<code>MCP</code>、<code>AI Foundation</code>、<code>Powered by Halo</code> 属品牌署名，按要求保留</td></tr>
+        <tr><td>主题升级</td><td>主题模板补丁会在主题升级时被覆盖；升级后重跑 <code>scripts/patch_theme.py</code> 即可</td></tr>
+        <tr><td>Basic 认证</td><td>为脚本化调用 API 而开启，生产环境应关闭并改用会话鉴权</td></tr>
+        <tr><td>数据留存</td><td>演示实例数据在 <code>workdir/</code>，<code>reset.sh</code> 可随时清空重建</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>站点 <a href="http://127.0.0.1:8092/">http://127.0.0.1:8092/</a> · 后台 <a href="http://127.0.0.1:8092/console">/console</a> · 账号 admin / Passw0rd!2026</p>
+    <p class="muted">本页由本地静态服务提供，仅用于效果验证。</p>
+  </footer>
+</div>
+
+<script>
+async function loadVerify(){
+  try{
+    const r = await fetch('run/verify.json', {cache:'no-store'});
+    if(!r.ok) throw new Error('no json');
+    const d = await r.json();
+    document.getElementById('meta-time').textContent = '验收时间 ' + d.checked_at;
+    document.getElementById('stat-pass').textContent = d.passed + '/' + d.total;
+    const ul = document.getElementById('checks');
+    ul.innerHTML = d.results.map(function(it){
+      return '<li><span class="tick' + (it.ok?'':' x') + '">' + (it.ok?'✔':'✘') + '</span><span>' +
+             it.name + '<br><span class="muted">' + String(it.detail).replace(/</g,'&lt;') + '</span></span></li>';
+    }).join('');
+  }catch(e){
+    document.getElementById('checks').innerHTML =
+      '<li><span class="tick x">✘</span><span>未能读取 run/verify.json，请确认静态服务根目录为 halo-cn/</span></li>';
+  }
+}
+loadVerify();
+</script>
+</body>
+</html>

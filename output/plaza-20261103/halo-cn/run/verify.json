@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-11-03 16:15:34",
+  "base": "http://127.0.0.1:8092",
+  "passed": 8,
+  "total": 8,
+  "ok": true,
+  "results": [
+    {
+      "name": "站点语言锁定",
+      "ok": true,
+      "detail": "language=zh-CN"
+    },
+    {
+      "name": "站点标题为中文字段",
+      "ok": true,
+      "detail": "title=警院成果展示广场"
+    },
+    {
+      "name": "首页 html lang",
+      "ok": true,
+      "detail": "lang=zh-CN"
+    },
+    {
+      "name": "首页无英文残留",
+      "ok": true,
+      "detail": "残留：无"
+    },
+    {
+      "name": "首页含中文字符",
+      "ok": true,
+      "detail": "中文字符数=169"
+    },
+    {
+      "name": "页脚已中文化",
+      "ok": true,
+      "detail": "页脚片段：03 0 分类目录 默认分类 1 标签 更多 #Halo 1 警院成果展示广场 © 2026 警院成果展示广场 版权所有，保留所有权利。技术支持： Halo ."
+    },
+    {
+      "name": "控制台 html lang",
+      "ok": true,
+      "detail": "lang=zh-CN"
+    },
+    {
+      "name": "管理员显示名中文化",
+      "ok": true,
+      "detail": "displayName=管理员"
+    }
+  ],
+  "page_text_sample": "警院成果展示广场 警院成果展示广场 首页 文章 默认分类 关于 登录 菜单 首页 文章 默认分类 关于 警院成果展示广场 警务技术实训成果的展示、体验与反馈 全部 默认分类 默认分类 #Halo 你好，Halo 如果你看到了这一篇文章，那么证明你已经安装成功了，感谢使用 Halo 进行创作，希望能够使用愉快。 管理员 发布于 2026-11-03 热门文章 你好，Halo 2026-11-03 0 分类目录 默认分类 1 标签 更多 #Halo 1 警院成果展示广场 © 2026 警院成果展示广场 版权所有，保留所有权利。技术支持： Halo ."
+}

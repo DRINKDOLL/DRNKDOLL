@@ -1,0 +1,33 @@
+[Unit]
+Description=Jingyuan Achievement Plaza (Halo 2.27.2)
+Documentation=http://8.138.34.151/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/plaza
+Environment=JAVA_HOME=/opt/jdk21
+Environment=LANG=zh_CN.UTF-8
+Environment=TZ=Asia/Shanghai
+Environment=NO_PROXY=127.0.0.1,localhost
+Environment=no_proxy=127.0.0.1,localhost
+
+# 1.8G 内存的实例：堆固定上限，给 Nginx/系统留出余量，避免 OOM Killer 杀进程
+ExecStart=/opt/jdk21/bin/java \
+    -Xms256m -Xmx900m -XX:MaxMetaspaceSize=256m \
+    -XX:+ExitOnOutOfMemoryError \
+    -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
+    -Duser.language=zh -Duser.country=CN -Duser.timezone=Asia/Shanghai \
+    -jar /opt/plaza/halo.jar \
+    --spring.config.additional-location=file:/opt/plaza/config/
+
+Restart=always
+RestartSec=10
+LimitNOFILE=65535
+StandardOutput=append:/opt/plaza/logs/stdout.log
+StandardError=append:/opt/plaza/logs/stderr.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,51 @@
+request_id: plaza-20261103
+workspace: C:\Users\LENOVO\Desktop\成果广场
+entry_type: full_pipeline
+stage_chain: [1, 2, 3]
+current_stage: 3
+output_docx_path: C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\stage3\成果展示广场平台需求文档.docx
+output_docx_user_specified: false
+created_at: "2026-11-03T14:10:00+08:00"
+updated_at: "2026-11-03T14:10:00+08:00"
+stages:
+  stage_0:
+    status: completed
+    completed_at: "2026-11-03T14:10:00+08:00"
+    intent: 从零创作《成果展示广场平台需求文档》，基于总纲口径与 24 项已确认业务决策
+    route_decision: 无既有文档 + 创作动词 → full_pipeline（S1→S2→S3）
+  stage_1:
+    status: completed
+    started_at: "2026-11-03T14:10:00+08:00"
+    completed_at: "2026-11-03T14:26:00+08:00"
+    output_path: "stage1/final_draft.md"
+    expert_used: general-writer
+    route_tag: general_writing
+    genre: general
+    quality_review: 87.7 pass
+  stage_2:
+    status: completed
+    completed_at: "2026-11-03T14:38:00+08:00"
+    route: html
+    html_sub: template
+    genre: business-report
+    output_path: "stage2/formatted-成果展示广场平台需求文档.html"
+    output_format: html
+    skills_invoked: [design-token, doc-typeset, html-review]
+    design_tokens_path: "stage2/design_tokens.json"
+    html_review_attempts: 1
+    html_review_score: 96
+    fallback: false
+  stage_3:
+    status: completed
+    started_at: "2026-11-03T14:40:00+08:00"
+    completed_at: "2026-11-03T14:42:00+08:00"
+    executor: doc-converter
+    input_format: html
+    output_path: "C:\\Users\\LENOVO\\Desktop\\成果广场\\output\\plaza-20261103\\stage3\\成果展示广场平台需求文档.docx"
+    skill_used: ["html-to-doc"]
+    present_files_opened: true
+    fallback: false
+    fallback_reason: null
+    chunks: null
+    preflight: passed (require_page_furniture)
+consistency_check: passed

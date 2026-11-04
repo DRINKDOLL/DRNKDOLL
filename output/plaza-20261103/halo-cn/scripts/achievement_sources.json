@@ -1,0 +1,95 @@
+{
+  "_comment": "成果详情抓取源配置。每个项目可配多个来源；content_selector 支持 'tag.cls' / '#id' / '.cls'，留空则自动定位正文最密集的容器。换成项目自己的来源页时，只改 url / content_selector / summary 即可，不用动代码。",
+  "projects": [
+    {
+      "slug": "work-traffic",
+      "title": "卡口车牌识别与轨迹还原",
+      "sources": [
+        {
+          "label": "ECCV18 开源车牌识别系统解析（腾讯云开发者社区）",
+          "url": "https://cloud.tencent.com/developer/article/1560725",
+          "content_selector": "",
+          "heading_shift": 1,
+          "max_chars": 2200,
+          "max_images": 2,
+          "summary": "本项目在卡口视频流上完成车牌检测与字符识别，再把同一车辆的过车记录按时序串联成可检索的轨迹。参考资料拆解了一套工业级车牌识别系统的三段式架构：先用 YOLO 类检测器定位车辆，再用 WPOD-NET 做车牌检测与倾斜校正，最后用轻量 OCR 网络直接回归字符序列、无需逐字分割——这条链路与本项目的算法分层一致，其中车牌校正环节正是提升卡口大角度抓拍识别率的关键。"
+        }
+      ]
+    },
+    {
+      "slug": "work-forensic",
+      "title": "电子物证取证工具箱",
+      "sources": [
+        {
+          "label": "使用 Volatility 进行内存取证（腾讯云开发者社区）",
+          "url": "https://cloud.tencent.com/developer/article/1039895",
+          "content_selector": "",
+          "heading_shift": 1,
+          "max_chars": 2400,
+          "max_images": 2,
+          "summary": "工具箱围绕镜像固定、哈希校验与时间线还原构建取证流程，最终输出符合规范的取证报告。参考资料按「先固定、再解析」的顺序还原真实案例：先用 Win32dd、DumpIt 一类工具导出内存镜像，再用 Volatility 的进程、网络连接、加载模块等插件逐层提取运行态证据，与本项目的流程编排、插件调用和报告模板一一对应。"
+        }
+      ]
+    },
+    {
+      "slug": "work-phone",
+      "title": "校园反诈宣传小程序",
+      "sources": [
+        {
+          "label": "安全教育知识竞赛答题小程序怎么做（腾讯云开发者社区）",
+          "url": "https://cloud.tencent.com/developer/news/2430245",
+          "content_selector": "",
+          "heading_shift": 1,
+          "max_chars": 2200,
+          "max_images": 1,
+          "summary": "小程序以情景化答题承载反诈宣传，覆盖 12 类高发骗局，上线首月触达 3200 人次。参考资料梳理了答题类小程序的完整实现路径：题库集中托管与随机抽题、限时作答与即时判题、成绩排名与错题统计，用云开发承载题库和答题记录；本项目在此基础上把骗局话术做成情景还原，并加入分享传播链路。"
+        }
+      ]
+    },
+    {
+      "slug": "work-crowd",
+      "title": "密集人群异常行为识别模型",
+      "sources": [
+        {
+          "label": "客流统计与人群聚集预警的技术实现（腾讯云开发者社区）",
+          "url": "https://cloud.tencent.com/developer/article/2611815",
+          "content_selector": "",
+          "heading_shift": 1,
+          "max_chars": 2200,
+          "max_images": 2,
+          "summary": "模型通过估计人群密度与分布来判断聚集、滞留等异常。参考资料给出了同类系统的落地做法：以检测加多目标跟踪统计进出人数，用高斯核密度估计生成动态热力图定位高频聚集区域，并预设密度阈值触发预警、联动疏导，与本项目「密度估计—阈值告警—事件上报」的处理链一致。"
+        }
+      ]
+    },
+    {
+      "slug": "work-network",
+      "title": "涉诈资金流向可视化分析平台",
+      "sources": [
+        {
+          "label": "图数据库在反欺诈与资金关联分析中的应用（腾讯云开发者社区）",
+          "url": "https://cloud.tencent.com/developer/article/1676240",
+          "content_selector": "",
+          "heading_shift": 1,
+          "max_chars": 2200,
+          "max_images": 2,
+          "summary": "平台把涉案账户与交易流水抽象成图：节点是账户、手机号、设备，边是转账与登录，再通过深链查询与社区发现定位资金归集、拆分和跨层转移路径。参考资料说明了为什么图模型比关系表更适合这类分析——诈骗团伙的账号越分散、层级越复杂，图上的关联关系反而越直观，这也正是本项目资金网络视图的技术依据。"
+        }
+      ]
+    },
+    {
+      "slug": "work-robot",
+      "title": "智能巡逻机器人自主路径规划",
+      "sources": [
+        {
+          "label": "ROS 2 Nav2 导航系统与规划器概述（腾讯云开发者社区）",
+          "url": "https://cloud.tencent.com/developer/article/1909715",
+          "content_selector": "",
+          "heading_shift": 1,
+          "max_chars": 2200,
+          "max_images": 2,
+          "summary": "机器人在校园场景中按预设路线自主巡航，遇行人或障碍时重新规划绕行。参考资料拆解了 Nav2 的模块协作：地图服务负责加载与更新环境地图，规划器在代价地图上求解最低成本路径，控制器把路径转换成速度指令，行为树在受阻时触发恢复动作，对应本项目「建图—定位—规划—控制」的完整链路。"
+        }
+      ]
+    }
+  ]
+}

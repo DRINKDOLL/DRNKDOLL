@@ -1,0 +1,106 @@
+<div
+  th:fragment="post-card(post,cover,animation,border,direction)"
+  class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md ring-black transition-all duration-500 hover:shadow-lg dark:bg-slate-800 dark:ring-slate-700"
+  th:classappend="${animation  ? 'hover:-translate-y-1' : ''} + ' ' + ${border ? 'hover:ring-2' : ''} + ' ' + ${direction == 'column' ? '!grid grid-cols-1 sm:grid-cols-5' : ''}"
+>
+  <div
+    th:if="${cover} and ${not #strings.isEmpty(post.spec.cover)}"
+    class="aspect-h-2 aspect-w-3"
+    th:classappend="${direction == 'column' ? 'col-span-2' : ''}"
+  >
+    <a th:href="@{${post.status.permalink}}" th:title="${post.spec.title}">
+      <img
+        th:src="${post.spec.cover}"
+        th:alt="${post.spec.title}"
+        th:srcset="|${thumbnail.gen(post.spec.cover, 's')} 400w,
+                    ${thumbnail.gen(post.spec.cover, 'm')} 800w,
+                    ${thumbnail.gen(post.spec.cover, 'l')} 1200w|"
+        sizes="(max-width: 1200px) 100vw, 1200px"
+        class="size-full object-cover transition-all duration-500"
+        th:classappend="${animation} ? 'group-hover:scale-105'"
+      />
+    </a>
+    <div th:if="${post.spec.pinned}" class="absolute !left-2 !top-1.5" th:title="#{fragment.postCard.pinned}">
+      <div class="i-bx-arrow-to-top !size-5 text-sky-600"></div>
+    </div>
+  </div>
+  <div
+    class="relative col-span-3 grid h-full grid-cols-1 content-between gap-2 p-4"
+    th:with="list_layout=${theme.config.layout.post_list_layout}"
+    th:classappend="${#strings.isEmpty(post.spec.cover) ? 'col-span-5' : ''}"
+  >
+    <div class="space-y-2">
+      <div
+        th:if="${not #lists.isEmpty(post.categories)} or ${not #lists.isEmpty(post.tags)}"
+        class="flex flex-wrap items-center gap-2"
+      >
+        <a
+          th:if="${#lists.size(post.categories)} gt 0"
+          th:href="@{${post.categories[0].status.permalink}}"
+          th:title="${post.categories[0].spec.displayName}"
+          th:text="${post.categories[0].spec.displayName}"
+          class="mr-1 text-sm font-medium text-gray-800 hover:text-gray-900 dark:text-slate-500 dark:hover:text-slate-600"
+        >
+        </a>
+        <a
+          th:each="tag : ${post.tags}"
+          th:href="@{${tag.status.permalink}}"
+          th:title="${tag.spec.displayName}"
+          th:text="|#${tag.spec.displayName}|"
+          class="cursor-pointer text-sm italic text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-500"
+        >
+        </a>
+      </div>
+      <h1
+        class="line-clamp-2 cursor-pointer text-lg font-medium transition-all hover:text-gray-500 hover:underline dark:text-slate-50 dark:hover:text-white"
+        th:classappend="|${direction == 'column' ? 'sm:line-clamp-2' : ''} ${list_layout == 'grid_2' ? 'sm:line-clamp-3' : ''} ${list_layout == 'grid_3' ? 'sm:line-clamp-4' : ''}|"
+      >
+        <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}" th:title="${post.spec.title}"></a>
+      </h1>
+      <div style="margin-top: 0.15rem">
+        <a
+          th:href="@{${post.status.permalink}}"
+          th:title="|查看《${post.spec.title}》完整内容（新窗口打开）|"
+          class="post-detail-link"
+          style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.7rem; border: 1px solid #cbd9ec; border-radius: 999px; background: #f3f7fd; color: #17457e; font-size: 0.8125rem; font-weight: 600; line-height: 1.6; text-decoration: none; white-space: nowrap; transition: background 0.2s, color 0.2s, border-color 0.2s" target="_blank" rel="noopener noreferrer">
+          <span>查看项目详情</span>
+          <span aria-hidden="true" style="font-size: 0.95rem; line-height: 1">›</span>
+        </a>
+      </div>
+      <p
+        class="font-sm line-clamp-2 font-light dark:text-slate-200"
+        th:classappend="${list_layout == 'grid_3' ? 'sm:line-clamp-3' : ''}"
+      >
+        <a
+          th:href="@{${post.status.permalink}}"
+          th:title="${post.spec.title}"
+          th:text="${post.status.excerpt}"
+          class="cursor-pointer hover:text-gray-600 dark:hover:text-white"
+          style="text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgba(107, 114, 128, 0.7); transition: color 0.2s, text-decoration-color 0.2s" target="_blank" rel="noopener noreferrer"
+        ></a>
+      </p>
+    </div>
+    <div class="mt-4 flex items-center justify-start gap-2">
+      <a th:href="@{${post.owner.permalink}}" th:title="${post.owner.displayName}">
+        <img
+          th:src="${post.owner.avatar ?: #theme.assets('/images/default-avatar.svg')}"
+          th:title="${post.owner.displayName}"
+          th:alt="${post.owner.displayName}"
+          class="size-8 rounded-full border drop-shadow-sm dark:border-slate-700"
+        />
+      </a>
+      <a
+        th:href="@{${post.owner.permalink}}"
+        th:title="${post.owner.displayName}"
+        class="text-sm font-medium text-gray-900 hover:text-gray-600 dark:text-slate-100 dark:hover:text-slate-200"
+        th:if="${#strings.isEmpty(post.owner.avatar)}"
+        th:text="${post.owner.displayName}"
+      ></a>
+      <span
+        class="text-sm tabular-nums text-gray-600 dark:text-slate-300"
+        th:text="#{common.publishedOn(${#dates.format(post.spec.publishTime,'yyyy-MM-dd')})}"
+      >
+      </span>
+    </div>
+  </div>
+</div>

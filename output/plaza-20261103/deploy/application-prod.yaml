@@ -1,0 +1,38 @@
+# 警院成果展示广场 —— 生产环境配置（Linux / 8.138.34.151）
+# 由 Nginx 监听 80 端口反向代理到本机 8092，因此应用只绑定回环地址。
+server:
+  port: 8092
+  address: 127.0.0.1
+
+halo:
+  # 对外访问地址：影响页面内绝对链接、RSS、sitemap 等
+  external-url: http://8.138.34.151
+  work-dir: /opt/plaza/workdir
+  security:
+    basic-auth:
+      # 本机演示期曾开启以便脚本调用 API；公网部署必须关闭，
+      # 否则任何人可用 HTTP Basic 直接调管理接口。
+      disabled: true
+
+spring:
+  web:
+    locale: zh_CN
+    resources:
+      cache:
+        cachecontrol:
+          # Halo 默认 max-age=365d，替换 /images、/styles 后浏览器仍用旧缓存。
+          # 改为协商缓存（304 极快），改界面后刷新即可见。
+          no-cache: true
+          max-age: 0
+  jackson:
+    time-zone: Asia/Shanghai
+  thymeleaf:
+    # 网关（登录/注册）模板由工作目录提供，用于定制站名与背景
+    prefix: file:/opt/plaza/workdir/templates/
+    cache: false
+
+logging:
+  level:
+    root: INFO
+  file:
+    name: /opt/plaza/logs/halo.log

@@ -1,0 +1,36 @@
+# Halo 中文化演示实例配置（bootstrap.sh 通过 --spring.config.additional-location 加载）
+server:
+  port: 8092
+
+halo:
+  external-url: http://127.0.0.1:8092
+  work-dir: ./workdir
+  security:
+    basic-auth:
+      # 仅本地演示需要脚本化调用 API；生产环境应关闭
+      disabled: false
+
+spring:
+  web:
+    locale: zh_CN
+    resources:
+      cache:
+        cachecontrol:
+          # Halo 默认 max-age=365d，导致替换 /images、/styles 下的静态资源后
+          # 浏览器仍使用一年内缓存的旧副本。改为每次协商缓存（304 极快），
+          # 保证界面改动刷新即可见。
+          no-cache: true
+          max-age: 0
+  jackson:
+    time-zone: Asia/Shanghai
+  thymeleaf:
+    # 网关（登录/注册/找回密码）模板改由工作目录提供，便于在不改动 jar 的前提下
+    # 定制站名标题与背景。模板文件来自 jar 的 BOOT-INF/classes/templates 原样复制。
+    prefix: file:./workdir/templates/
+    cache: false
+
+logging:
+  level:
+    root: INFO
+  file:
+    name: ./run/halo.log
