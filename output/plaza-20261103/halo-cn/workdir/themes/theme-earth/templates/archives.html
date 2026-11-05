@@ -316,6 +316,7 @@
                   <th:block th:each="post : ${month.posts}">
                     <div
                       class="my-2 rounded-xl border border-gray-300 bg-white shadow-sm hover:border-gray-400 hover:shadow dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-700"
+                      th:attr="data-am-name=${post.metadata.name}"
                     >
                       <div class="relative flex flex-col gap-2 p-4">
                         <div class="flex min-w-0 flex-wrap items-center justify-between gap-4">
@@ -324,6 +325,7 @@
                               th:href="${post.status.permalink}"
                               class="truncate text-xl font-medium text-gray-900 hover:text-gray-500 hover:underline dark:text-slate-50 dark:hover:text-white"
                               th:text="${post.spec.title}"
+                              th:attr="data-am-title=${post.spec.title}"
                             ></a>
                           </div>
                           <div class="col-span-3 col-start-11">
@@ -365,7 +367,15 @@
                           </a>
                         </div>
                         <div class="line-clamp-2 text-sm font-light dark:text-slate-200">
-                          <th:block th:text="${post.status.excerpt}"></th:block>
+                          <th:block th:text="${post.status.excerpt}" th:attr="data-am-excerpt=${post.status.excerpt}"></th:block>
+                        </div>
+                        <div class="am-mgmt" style="align-items:center;gap:.35rem">
+                          <button type="button" class="am-btn am-btn-edit"
+                                  th:attr="data-am-action='edit',data-am-name=${post.metadata.name},data-am-title=${post.spec.title},data-am-excerpt=${post.status.excerpt},data-am-cover=${post.spec.cover}"
+                                  th:title="|编辑《${post.spec.title}》|"><span style="font-size:.8rem">✎</span>编辑</button>
+                          <button type="button" class="am-btn am-btn-del"
+                                  th:attr="data-am-action='delete',data-am-name=${post.metadata.name},data-am-title=${post.spec.title}"
+                                  th:title="|删除《${post.spec.title}》|"><span style="font-size:.8rem">🗑</span>删除</button>
                         </div>
                       </div>
                     </div>
@@ -566,6 +576,8 @@
     >
       <span class="i-tabler-chevron-up text-2xl text-gray-600 dark:text-slate-200"></span>
     </button>
+
+    <th:block th:replace="~{modules/achievement-manage :: achievement-manage}" />
   </body>
 </html>
 

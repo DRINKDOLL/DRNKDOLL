@@ -373,6 +373,20 @@
               </template>
             </div>
             <div
+              sec:authorize="isAuthenticated()"
+              th:attr="x-data=|uiPermission('${#authentication.name}','system:posts:manage')|"
+              class="flex items-center justify-between"
+            >
+              <template x-if="shouldDisplay">
+                <button
+                  type="button"
+                  class="am-btn am-btn-del"
+                  th:attr="data-am-action='delete',data-am-name=${post.metadata.name},data-am-title=${post.spec.title}"
+                  th:title="|删除《${post.spec.title}》|"
+                ><span style="font-size:.8rem">🗑</span>删除</button>
+              </template>
+            </div>
+            <div
               th:if="${theme.config.post.show_upvote_button}"
               @click="handleUpvote(name)"
               class="group inline-flex cursor-pointer items-center rounded-lg"
@@ -740,6 +754,8 @@
         for (i = 0; i < links.length; i++) links[i].addEventListener('click', goBack);
       })();
     </script>
+
+    <th:block th:replace="~{modules/achievement-manage :: achievement-manage}" />
   </body>
 </html>
 

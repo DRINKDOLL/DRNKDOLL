@@ -1,0 +1,247 @@
+<!-- 成果管理：编辑 / 删除（管理员可见）。此 fragment 需放在页面 body 末尾附近，提供：
+     1) 全局权限探测（登录且具备 system:posts:manage 时给 <html> 加 .is-manager）；
+     2) 编辑弹窗 + 删除确认弹窗；
+     3) window.AchievementManage 全局对象，供卡片上的按钮调用。 -->
+<th:block th:fragment="achievement-manage">
+  <div id="am-overlay" class="am-hidden" style="position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.5);backdrop-filter:blur(2px);display:none"></div>
+
+  <!-- 编辑弹窗 -->
+  <div id="am-edit-modal" role="dialog" aria-modal="true" aria-labelledby="am-edit-title"
+       class="am-hidden" style="position:fixed;left:50%;top:50%;z-index:70;width:min(92vw,34rem);transform:translate(-50%,-50%);background:#fff;border-radius:.9rem;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden;display:none">
+    <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #eef2f7">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h3 id="am-edit-title" style="margin:0;font-size:1.05rem;font-weight:700;color:#0f172a">编辑成果</h3>
+        <button type="button" onclick="AchievementManage.close()" aria-label="关闭"
+                style="border:0;background:none;font-size:1.4rem;line-height:1;color:#94a3b8;cursor:pointer">×</button>
+      </div>
+    </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem">
+      <div>
+        <label for="am-f-title" style="display:block;margin-bottom:.35rem;font-size:.8125rem;font-weight:600;color:#334155">标题</label>
+        <input id="am-f-title" type="text" maxlength="120" placeholder="成果标题"
+               style="width:100%;box-sizing:border-box;padding:.55rem .75rem;border:1px solid #cbd5e1;border-radius:.55rem;font-size:.9rem;color:#0f172a;outline:none" />
+      </div>
+      <div>
+        <label for="am-f-excerpt" style="display:block;margin-bottom:.35rem;font-size:.8125rem;font-weight:600;color:#334155">简介 / 描述</label>
+        <textarea id="am-f-excerpt" rows="3" maxlength="240" placeholder="一两句话介绍这个成果"
+                  style="width:100%;box-sizing:border-box;padding:.55rem .75rem;border:1px solid #cbd5e1;border-radius:.55rem;font-size:.9rem;color:#0f172a;outline:none;resize:vertical"></textarea>
+      </div>
+      <div>
+        <label for="am-f-cover" style="display:block;margin-bottom:.35rem;font-size:.8125rem;font-weight:600;color:#334155">封面图片地址</label>
+        <input id="am-f-cover" type="text" placeholder="https://…（留空表示移除封面）"
+               style="width:100%;box-sizing:border-box;padding:.55rem .75rem;border:1px solid #cbd5e1;border-radius:.55rem;font-size:.9rem;color:#0f172a;outline:none" />
+        <div id="am-f-cover-preview" style="margin-top:.5rem;display:none">
+          <img id="am-f-cover-img" alt="封面预览" style="width:100%;height:10rem;object-fit:cover;border-radius:.55rem;border:1px solid #e2e8f0;background:#f8fafc" />
+        </div>
+      </div>
+      <div id="am-edit-msg" style="display:none;font-size:.8125rem;border-radius:.5rem;padding:.5rem .75rem"></div>
+    </div>
+    <div style="padding:1rem 1.5rem;border-top:1px solid #eef2f7;display:flex;justify-content:flex-end;gap:.6rem">
+      <button type="button" onclick="AchievementManage.close()"
+              style="padding:.5rem 1rem;border:1px solid #cbd5e1;border-radius:.55rem;background:#fff;color:#475569;font-size:.875rem;font-weight:600;cursor:pointer">取消</button>
+      <button type="button" id="am-btn-save" onclick="AchievementManage.submitEdit()"
+              style="padding:.5rem 1rem;border:0;border-radius:.55rem;background:#17457e;color:#fff;font-size:.875rem;font-weight:600;cursor:pointer">保存</button>
+    </div>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div id="am-del-modal" role="dialog" aria-modal="true" aria-labelledby="am-del-title"
+       class="am-hidden" style="position:fixed;left:50%;top:50%;z-index:70;width:min(92vw,26rem);transform:translate(-50%,-50%);background:#fff;border-radius:.9rem;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden;display:none">
+    <div style="padding:1.5rem">
+      <h3 id="am-del-title" style="margin:0 0 .6rem;font-size:1.05rem;font-weight:700;color:#0f172a">删除成果</h3>
+      <p id="am-del-body" style="margin:0 0 1rem;font-size:.9rem;color:#475569;line-height:1.6"></p>
+      <div id="am-del-msg" style="display:none;font-size:.8125rem;border-radius:.5rem;padding:.5rem .75rem;margin-bottom:.75rem"></div>
+    </div>
+    <div style="padding:1rem 1.5rem;border-top:1px solid #eef2f7;display:flex;justify-content:flex-end;gap:.6rem">
+      <button type="button" onclick="AchievementManage.close()"
+              style="padding:.5rem 1rem;border:1px solid #cbd5e1;border-radius:.55rem;background:#fff;color:#475569;font-size:.875rem;font-weight:600;cursor:pointer">取消</button>
+      <button type="button" id="am-btn-del" onclick="AchievementManage.doDelete()"
+              style="padding:.5rem 1rem;border:0;border-radius:.55rem;background:#dc2626;color:#fff;font-size:.875rem;font-weight:600;cursor:pointer">确认删除</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // 本机/局域网演示：代理与页面同主机不同端口（8093），按实际主机名拼接；
+      // 线上部署：Nginx 已把 /api/manage/ 反代到 127.0.0.1:8093 并加登录门禁，故走同源相对路径。
+      var PROXY = /^(127\.0\.0\.1|localhost|10\.1\.1\.239)$/.test(location.hostname)
+        ? (location.protocol + '//' + location.hostname + ':8093/api/manage/achievements')
+        : '/api/manage/achievements';
+      var M = window.AchievementManage = {
+        current: null,
+        editing: false,
+        open: function (which) {
+          M.close();
+          document.getElementById('am-overlay').style.display = 'block';
+          document.getElementById(which === 'del' ? 'am-del-modal' : 'am-edit-modal').style.display = 'block';
+        },
+        close: function () {
+          document.getElementById('am-overlay').style.display = 'none';
+          document.getElementById('am-edit-modal').style.display = 'none';
+          document.getElementById('am-del-modal').style.display = 'none';
+          M.editing = false;
+          M.current = null;
+        },
+        openEdit: function (name, title, excerpt, cover) {
+          M.open('edit');
+          M.current = { name: name };
+          M.editing = true;
+          document.getElementById('am-f-title').value = title || '';
+          document.getElementById('am-f-excerpt').value = excerpt || '';
+          document.getElementById('am-f-cover').value = cover || '';
+          M.renderCoverPreview();
+          M.setMsg('edit', null);
+        },
+        confirmDelete: function (name, title) {
+          M.open('del');
+          M.current = { name: name };
+          M.editing = false;
+          document.getElementById('am-del-body').innerHTML =
+            '确定要删除 <strong>' + M.esc(title || '该成果') + '</strong> 吗？<br/>删除后成果将移入回收站，前台不再展示。';
+          M.setMsg('del', null);
+        },
+        renderCoverPreview: function () {
+          var url = document.getElementById('am-f-cover').value.trim();
+          var box = document.getElementById('am-f-cover-preview');
+          var img = document.getElementById('am-f-cover-img');
+          if (url) { box.style.display = 'block'; img.src = url; }
+          else { box.style.display = 'none'; }
+        },
+        setMsg: function (kind, text, ok) {
+          var el = document.getElementById(kind === 'del' ? 'am-del-msg' : 'am-edit-msg');
+          if (!text) { el.style.display = 'none'; return; }
+          el.style.display = 'block';
+          el.textContent = text;
+          el.style.background = ok ? '#ecfdf5' : '#fef2f2';
+          el.style.color = ok ? '#065f46' : '#b91c1c';
+        },
+        submitEdit: function () {
+          if (!M.current) return;
+          var btn = document.getElementById('am-btn-save');
+          var payload = {
+            title: document.getElementById('am-f-title').value.trim(),
+            excerpt: document.getElementById('am-f-excerpt').value.trim(),
+            cover: document.getElementById('am-f-cover').value.trim()
+          };
+          if (!payload.title) { M.setMsg('edit', '标题不能为空', false); return; }
+          btn.disabled = true; btn.textContent = '保存中…';
+          M.fetchJson(PROXY + '/' + encodeURIComponent(M.current.name), 'PUT', payload)
+            .then(function () {
+              M.setMsg('edit', '保存成功', true);
+              M.applyEditToCard(payload);
+              setTimeout(M.close, 600);
+            })
+            .catch(function (e) { M.setMsg('edit', '保存失败：' + e.message, false); })
+            .finally(function () { btn.disabled = false; btn.textContent = '保存'; });
+        },
+        doDelete: function () {
+          if (!M.current) return;
+          var btn = document.getElementById('am-btn-del');
+          btn.disabled = true; btn.textContent = '删除中…';
+          M.fetchJson(PROXY + '/' + encodeURIComponent(M.current.name) + '/recycle', 'PUT', {})
+            .then(function () {
+              M.setMsg('del', '已删除', true);
+              M.removeCard(M.current.name);
+              setTimeout(M.close, 500);
+            })
+            .catch(function (e) { M.setMsg('del', '删除失败：' + e.message, false); })
+            .finally(function () { btn.disabled = false; btn.textContent = '确认删除'; });
+        },
+        applyEditToCard: function (payload) {
+          var card = document.querySelector('[data-am-name="' + M.current.name + '"]');
+          if (!card) return;
+          var t = card.querySelector('[data-am-title]');
+          if (t && payload.title) t.textContent = payload.title;
+          var ex = card.querySelector('[data-am-excerpt]');
+          if (ex && payload.excerpt) ex.textContent = payload.excerpt;
+          var img = card.querySelector('[data-am-cover]');
+          if (img) {
+            if (payload.cover) img.src = payload.cover;
+            else img.closest('[data-am-cover-wrap]') && img.closest('[data-am-cover-wrap]').remove();
+          }
+        },
+        removeCard: function (name) {
+          var card = document.querySelector('[data-am-name="' + name + '"]');
+          if (card) card.remove();
+          M.refreshEmptyState();
+        },
+        refreshEmptyState: function () {
+          var list = document.getElementById('post-list');
+          var empty = document.getElementById('post-empty');
+          if (!list || !empty) return;
+          var remaining = list.querySelectorAll('[data-am-name]').length;
+          empty.style.display = remaining ? 'none' : 'flex';
+          list.style.display = remaining ? '' : 'none';
+        },
+        fetchJson: function (url, method, body) {
+          return fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: method === 'PUT' ? JSON.stringify(body) : undefined
+          }).then(function (resp) {
+            return resp.text().then(function (txt) {
+              var data = null;
+              try { data = txt ? JSON.parse(txt) : null; } catch (e) {}
+              if (!resp.ok) {
+                var msg = (data && (data.detail || data.error)) || ('HTTP ' + resp.status);
+                throw new Error(msg);
+              }
+              return data;
+            });
+          });
+        },
+        esc: function (s) {
+          return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+      };
+
+      // 权限探测：登录且具备系统文章管理权限时，给 <html> 加 .is-manager，展示管理按钮
+      function detectManager() {
+        fetch('/apis/api.console.halo.run/v1alpha1/users/-/permissions', { credentials: 'include' })
+          .then(function (resp) {
+            if (!resp.ok) return;
+            return resp.json();
+          })
+          .then(function (data) {
+            if (!data) return;
+            var perms = data.uiPermissions || [];
+            if (perms.indexOf('*') >= 0 || perms.indexOf('system:posts:manage') >= 0) {
+              document.documentElement.classList.add('is-manager');
+            }
+          })
+          .catch(function () { /* 未登录或无权限，保持隐藏 */ });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', detectManager);
+      } else {
+        detectManager();
+      }
+
+      // 封面预览联动
+      var coverInput = document.getElementById('am-f-cover');
+      if (coverInput) coverInput.addEventListener('input', M.renderCoverPreview);
+
+      // 点击遮罩关闭
+      document.getElementById('am-overlay').addEventListener('click', M.close);
+
+      // 委托监听：卡片上的「编辑 / 删除」按钮
+      document.addEventListener('click', function (ev) {
+        var btn = ev.target && ev.target.closest ? ev.target.closest('[data-am-action]') : null;
+        if (!btn) return;
+        var name = btn.getAttribute('data-am-name');
+        var action = btn.getAttribute('data-am-action');
+        if (action === 'edit') {
+          M.openEdit(
+            name,
+            btn.getAttribute('data-am-title'),
+            btn.getAttribute('data-am-excerpt'),
+            btn.getAttribute('data-am-cover')
+          );
+        } else if (action === 'delete') {
+          M.confirmDelete(name, btn.getAttribute('data-am-title'));
+        }
+      });
+    })();
+  </script>
+</th:block>

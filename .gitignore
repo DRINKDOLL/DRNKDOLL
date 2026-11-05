@@ -9,6 +9,9 @@ output/plaza-20261103/halo-cn/workdir/plugins/*.jar
 output/plaza-20261103/halo-cn/workdir/db/
 output/plaza-20261103/halo-cn/archive/
 
+# Lucene 搜索索引（运行时产物，随搜索变化）
+output/plaza-20261103/halo-cn/workdir/indices/
+
 # halo-lab 实验插件与运行产物
 output/plaza-20261103/halo-lab/work/
 output/plaza-20261103/halo-lab/logs/

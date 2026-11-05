@@ -2,16 +2,18 @@
   th:fragment="post-card(post,cover,animation,border,direction)"
   class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md ring-black transition-all duration-500 hover:shadow-lg dark:bg-slate-800 dark:ring-slate-700"
   th:classappend="${animation  ? 'hover:-translate-y-1' : ''} + ' ' + ${border ? 'hover:ring-2' : ''} + ' ' + ${direction == 'column' ? '!grid grid-cols-1 sm:grid-cols-5' : ''}"
+  th:attr="data-am-name=${post.metadata.name}"
 >
   <div
     th:if="${cover} and ${not #strings.isEmpty(post.spec.cover)}"
     class="aspect-h-2 aspect-w-3"
     th:classappend="${direction == 'column' ? 'col-span-2' : ''}"
   >
-    <a th:href="@{${post.status.permalink}}" th:title="${post.spec.title}">
+    <a th:href="@{${post.status.permalink}}" th:title="${post.spec.title}" th:attr="data-am-cover-wrap='true'">
       <img
         th:src="${post.spec.cover}"
         th:alt="${post.spec.title}"
+        th:attr="data-am-cover=${post.spec.cover}"
         th:srcset="|${thumbnail.gen(post.spec.cover, 's')} 400w,
                     ${thumbnail.gen(post.spec.cover, 'm')} 800w,
                     ${thumbnail.gen(post.spec.cover, 'l')} 1200w|"
@@ -55,7 +57,7 @@
         class="line-clamp-2 cursor-pointer text-lg font-medium transition-all hover:text-gray-500 hover:underline dark:text-slate-50 dark:hover:text-white"
         th:classappend="|${direction == 'column' ? 'sm:line-clamp-2' : ''} ${list_layout == 'grid_2' ? 'sm:line-clamp-3' : ''} ${list_layout == 'grid_3' ? 'sm:line-clamp-4' : ''}|"
       >
-        <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}" th:title="${post.spec.title}"></a>
+        <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}" th:title="${post.spec.title}" th:attr="data-am-title=${post.spec.title}"></a>
       </h1>
       <div style="margin-top: 0.15rem">
         <a
@@ -76,6 +78,7 @@
           th:title="${post.spec.title}"
           th:text="${post.status.excerpt}"
           class="cursor-pointer hover:text-gray-600 dark:hover:text-white"
+          th:attr="data-am-excerpt=${post.status.excerpt}"
           style="text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgba(107, 114, 128, 0.7); transition: color 0.2s, text-decoration-color 0.2s" target="_blank" rel="noopener noreferrer"
         ></a>
       </p>
@@ -101,6 +104,14 @@
         th:text="#{common.publishedOn(${#dates.format(post.spec.publishTime,'yyyy-MM-dd')})}"
       >
       </span>
+      <div class="am-mgmt" style="margin-left:auto;align-items:center;gap:.35rem">
+        <button type="button" class="am-btn am-btn-edit"
+                th:attr="data-am-action='edit',data-am-name=${post.metadata.name},data-am-title=${post.spec.title},data-am-excerpt=${post.status.excerpt},data-am-cover=${post.spec.cover}"
+                th:title="|编辑《${post.spec.title}》|"><span style="font-size:.8rem">✎</span>编辑</button>
+        <button type="button" class="am-btn am-btn-del"
+                th:attr="data-am-action='delete',data-am-name=${post.metadata.name},data-am-title=${post.spec.title}"
+                th:title="|删除《${post.spec.title}》|"><span style="font-size:.8rem">🗑</span>删除</button>
+      </div>
     </div>
   </div>
 </div>

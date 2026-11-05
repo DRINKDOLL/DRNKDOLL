@@ -540,6 +540,7 @@
           renderCard(p) {
             const spec = p.spec || {};
             const permalink = (p.status && p.status.permalink) || '/archives/' + (spec.slug || '');
+            const name = (p.metadata && p.metadata.name) || '';
             const cover = spec.cover || '';
             const title = this.esc(spec.title || '');
             const excerpt = this.esc((p.status && p.status.excerpt) || (spec.excerpt && spec.excerpt.raw) || '');
@@ -556,10 +557,14 @@
               return '<a href="' + this.esc(l) + '" title="' + n + '" class="cursor-pointer text-sm italic text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-500">#' + n + '</a>';
             }).join('');
             const coverHtml = cover
-              ? '<div class="aspect-h-2 aspect-w-3"><a href="' + this.esc(permalink) + '" title="' + title + '"><img src="' + this.esc(cover) + '" alt="' + title + '" class="size-full object-cover transition-all duration-500 group-hover:scale-105" /></a></div>'
+              ? '<div class="aspect-h-2 aspect-w-3" data-am-cover-wrap="true"><a href="' + this.esc(permalink) + '" title="' + title + '"><img src="' + this.esc(cover) + '" alt="' + title + '" data-am-cover="' + this.esc(cover) + '" class="size-full object-cover transition-all duration-500 group-hover:scale-105" /></a></div>'
               : '';
+            const mgmt = '<div class="am-mgmt" style="margin-left:auto;align-items:center;gap:.35rem">' +
+              '<button type="button" class="am-btn am-btn-edit" data-am-action="edit" data-am-name="' + this.esc(name) + '" data-am-title="' + title + '" data-am-excerpt="' + excerpt + '" data-am-cover="' + this.esc(cover) + '" title="编辑《' + title + '》"><span style="font-size:.8rem">✎</span>编辑</button>' +
+              '<button type="button" class="am-btn am-btn-del" data-am-action="delete" data-am-name="' + this.esc(name) + '" data-am-title="' + title + '" title="删除《' + title + '》"><span style="font-size:.8rem">🗑</span>删除</button>' +
+              '</div>';
             return (
-              '<div class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md ring-black transition-all duration-500 hover:shadow-lg hover:-translate-y-1 hover:ring-2 dark:bg-slate-800 dark:ring-slate-700">' +
+              '<div class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md ring-black transition-all duration-500 hover:shadow-lg hover:-translate-y-1 hover:ring-2 dark:bg-slate-800 dark:ring-slate-700" data-am-name="' + this.esc(name) + '">' +
                 coverHtml +
                 '<div class="relative grid h-full grid-cols-1 content-between gap-2 p-4">' +
                   '<div class="space-y-2">' +
@@ -567,13 +572,14 @@
                       (catName ? '<a href="' + this.esc(catLink) + '" title="' + catName + '" class="mr-1 text-sm font-medium text-gray-800 hover:text-gray-900 dark:text-slate-500 dark:hover:text-slate-600">' + catName + '</a>' : '') +
                       tags +
                     '</div>' +
-                    '<h1 class="line-clamp-2 cursor-pointer text-lg font-medium transition-all hover:text-gray-500 hover:underline dark:text-slate-50 dark:hover:text-white sm:line-clamp-4"><a href="' + this.esc(permalink) + '" title="' + title + '">' + title + '</a></h1>' +
+                    '<h1 class="line-clamp-2 cursor-pointer text-lg font-medium transition-all hover:text-gray-500 hover:underline dark:text-slate-50 dark:hover:text-white sm:line-clamp-4"><a href="' + this.esc(permalink) + '" title="' + title + '" data-am-title="' + title + '">' + title + '</a></h1>' +
                     '<div style="margin-top:.15rem"><a href="' + this.esc(permalink) + '" title="查看《' + title + '》完整内容（新窗口打开）" target="_blank" rel="noopener noreferrer" class="post-detail-link" style="display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .7rem;border:1px solid #cbd9ec;border-radius:999px;background:#f3f7fd;color:#17457e;font-size:.8125rem;font-weight:600;line-height:1.6;text-decoration:none;white-space:nowrap;transition:background .2s,color .2s,border-color .2s" target="_blank" rel="noopener noreferrer">查看项目详情<span aria-hidden="true" style="font-size:.95rem;line-height:1">›</span></a></div>' +
-                    '<p class="font-sm line-clamp-2 font-light dark:text-slate-200 sm:line-clamp-3"><a href="' + this.esc(permalink) + '" title="' + title + '" class="cursor-pointer hover:text-gray-600 dark:hover:text-white" style="text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:rgba(107,114,128,.7);transition:color .2s,text-decoration-color .2s" target="_blank" rel="noopener noreferrer">' + excerpt + '</a></p>' +
+                    '<p class="font-sm line-clamp-2 font-light dark:text-slate-200 sm:line-clamp-3"><a href="' + this.esc(permalink) + '" title="' + title + '" data-am-excerpt="' + excerpt + '" class="cursor-pointer hover:text-gray-600 dark:hover:text-white" style="text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:rgba(107,114,128,.7);transition:color .2s,text-decoration-color .2s" target="_blank" rel="noopener noreferrer">' + excerpt + '</a></p>' +
                   '</div>' +
                   '<div class="mt-4 flex items-center justify-start gap-2">' +
                     '<a href="' + this.esc(owner.permalink || '') + '" title="' + ownerName + '"><img src="' + this.esc(avatar) + '" alt="' + ownerName + '" class="size-8 rounded-full border drop-shadow-sm dark:border-slate-700" /></a>' +
                     '<span class="text-sm tabular-nums text-gray-600 dark:text-slate-300">' + pub + '</span>' +
+                    mgmt +
                   '</div>' +
                 '</div>' +
               '</div>'
@@ -587,6 +593,8 @@
         }));
       });
     </script>
+
+    <th:block th:replace="~{modules/achievement-manage :: achievement-manage}" />
   </body>
 </html>
 

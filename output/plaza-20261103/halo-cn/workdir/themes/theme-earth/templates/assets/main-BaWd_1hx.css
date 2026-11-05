@@ -28,3 +28,14 @@
 .dark #content hr{border-color:#334155}
 .dark #content figure img{border-color:#334155 !important;background:#0f172a !important}
 .dark #content figcaption{color:#94a3b8 !important}
+
+
+/* ===== 成果管理：编辑/删除按钮与弹窗（仅 .is-manager 展示） ===== */
+.am-mgmt{display:none}
+html.is-manager .am-mgmt{display:inline-flex}
+html.is-manager .am-mgmt-block{display:flex}
+.am-btn{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .6rem;border-radius:999px;font-size:.75rem;font-weight:600;line-height:1.5;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.am-btn-edit{border-color:#cbd5e1;background:#fff;color:#475569}
+.am-btn-edit:hover{border-color:#17457e;color:#17457e;background:#f3f7fd}
+.am-btn-del{border-color:#fecaca;background:#fff;color:#dc2626}
+.am-btn-del:hover{background:#fef2f2;border-color:#dc2626}
