@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成果展示广场 · 警务化改版效果图</title>
+<style>
+:root{
+  --bg:#0a1530;
+  --bg-deep:#070f22;
+  --surface:#0f1f3f;
+  --surface-2:#14264a;
+  --surface-3:#1a3058;
+  --border:#1e3a66;
+  --border-light:#2a4a7a;
+  --blue:#1e6fd9;
+  --blue-bright:#3b8bff;
+  --cyan:#38bdf8;
+  --gold:#d4af6a;
+  --gold-bright:#e8c984;
+  --text:#e8eef7;
+  --text-dim:#a8b8cf;
+  --text-mute:#6f7f99;
+  --red:#e24b4a;
+  --radius:14px;
+  --radius-sm:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  background:var(--bg-deep);
+  color:var(--text);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+
+/* 说明头 */
+.doc-head{padding:40px 0 8px;text-align:center}
+.doc-head .tag{display:inline-block;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:4px 14px;letter-spacing:1px;margin-bottom:14px}
+.doc-head h1{font-size:26px;font-weight:700;letter-spacing:1px}
+.doc-head p{color:var(--text-dim);font-size:14px;margin-top:8px}
+
+/* 页面框架演示 */
+.demo-frame{
+  margin:36px 0;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  background:var(--bg);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.demo-label{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.demo-label .dot{width:10px;height:10px;border-radius:50%;background:var(--border-light)}
+.demo-label .dot:first-child{background:var(--blue)}
+.demo-label span{font-size:13px;color:var(--text-dim)}
+.demo-label .page-name{color:var(--gold);font-weight:600}
+
+/* 顶部导航 */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px;
+  background:linear-gradient(180deg,rgba(20,38,74,.95),rgba(15,31,63,.9));
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .shield{
+  width:40px;height:44px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo .shield svg{width:40px;height:44px}
+.logo .logo-text{line-height:1.2}
+.logo .logo-text .zh{font-size:17px;font-weight:700;letter-spacing:1px}
+.logo .logo-text .en{font-size:10px;color:var(--text-mute);letter-spacing:2px;text-transform:uppercase}
+.nav{display:flex;gap:6px}
+.nav a{
+  color:var(--text-dim);text-decoration:none;font-size:14px;
+  padding:8px 16px;border-radius:8px;transition:.2s;
+}
+.nav a:hover{color:var(--text);background:var(--surface-3)}
+.nav a.active{color:#fff;background:var(--blue);font-weight:600}
+.topbar .right{display:flex;align-items:center;gap:14px}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:8px;padding:7px 14px;
+}
+.search-box svg{width:15px;height:15px;fill:none;stroke:var(--text-mute);stroke-width:2}
+.search-box input{background:transparent;border:none;outline:none;color:var(--text);font-size:13px;width:160px}
+.search-box input::placeholder{color:var(--text-mute)}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--surface-3);border:1px solid var(--border-light);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold)}
+
+/* Hero */
+.hero{position:relative;padding:72px 28px;overflow:hidden;background:radial-gradient(ellipse at 30% 20%,rgba(30,111,217,.25),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(56,189,248,.15),transparent 55%),var(--bg-deep)}
+.hero .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(30,58,102,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(30,58,102,.18) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%)}
+.hero .hero-inner{position:relative;max-width:760px}
+.hero .badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--cyan);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);padding:5px 14px;border-radius:20px;letter-spacing:1px;margin-bottom:20px}
+.hero h2{font-size:44px;font-weight:800;line-height:1.2;letter-spacing:1px;margin-bottom:18px}
+.hero h2 .accent{color:var(--gold-bright)}
+.hero .sub{font-size:16px;color:var(--text-dim);max-width:600px;margin-bottom:32px}
+.hero .cta{display:flex;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-bright));color:#fff;box-shadow:0 8px 20px rgba(30,111,217,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(30,111,217,.5)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border-light)}
+.btn-ghost:hover{background:var(--surface-2)}
+.hero .stats{display:flex;gap:40px;margin-top:48px}
+.hero .stat .num{font-size:30px;font-weight:800;color:#fff}
+.hero .stat .num span{color:var(--gold)}
+.hero .stat .lbl{font-size:13px;color:var(--text-mute);margin-top:2px}
+
+/* 区块标题 */
+.section{padding:48px 0}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+.section-head .t{display:flex;align-items:center;gap:12px}
+.section-head .bar{width:4px;height:22px;background:var(--gold);border-radius:2px}
+.section-head h3{font-size:20px;font-weight:700;letter-spacing:1px}
+.section-head .more{font-size:13px;color:var(--text-dim);text-decoration:none;display:flex;align-items:center;gap:4px}
+.section-head .more:hover{color:var(--gold)}
+
+/* 分类筛选 chips */
+.filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.chip{
+  padding:8px 18px;border-radius:20px;font-size:13px;cursor:pointer;
+  background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);
+  transition:.2s;white-space:nowrap;
+}
+.chip:hover{border-color:var(--border-light);color:var(--text)}
+.chip.active{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+
+/* 作品网格 */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;transition:.25s;cursor:pointer;
+  display:flex;flex-direction:column;
+}
+.card:hover{transform:translateY(-6px);border-color:var(--blue);box-shadow:0 16px 40px rgba(30,111,217,.25)}
+.card .cover{position:relative;height:180px;overflow:hidden;background:var(--surface-2)}
+.card .cover img{width:100%;height:100%;object-fit:cover;display:block}
+.card .cover .rank{
+  position:absolute;top:12px;left:12px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright));
+  color:#1a1a1a;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;
+}
+.card .cover .award{position:absolute;top:12px;right:12px;font-size:11px;color:var(--gold);background:rgba(7,15,34,.8);padding:3px 8px;border-radius:6px;border:1px solid rgba(212,175,106,.4)}
+.card .body{padding:18px 20px;flex:1;display:flex;flex-direction:column}
+.card .cat{font-size:11px;color:var(--cyan);letter-spacing:1px;margin-bottom:8px}
+.card h4{font-size:16px;font-weight:700;margin-bottom:8px;line-height:1.4}
+.card .desc{font-size:13px;color:var(--text-dim);margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.card .tag{font-size:11px;color:var(--text-mute);background:var(--surface-2);border:1px solid var(--border);padding:2px 8px;border-radius:4px}
+.card .meta{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:14px;border-top:1px solid var(--border)}
+.card .meta .author{display:flex;align-items:center;gap:8px}
+.card .meta .author .ava{width:24px;height:24px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);border:1px solid var(--border-light)}
+.card .meta .author span{font-size:12px;color:var(--text-dim)}
+.card .meta .stat{display:flex;gap:12px;font-size:12px;color:var(--text-mute)}
+.card .meta .stat b{color:var(--text-dim);font-weight:600}
+
+/* 精选 banner */
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:0;margin-bottom:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.feature .f-cover{position:relative;min-height:320px;background:var(--surface-2);display:flex;align-items:center;justify-content:center}
+.feature .f-cover .ph{font-size:60px;color:var(--border-light)}
+.feature .f-body{padding:40px;display:flex;flex-direction:column;justify-content:center}
+.feature .f-body .flag{font-size:12px;color:var(--gold);letter-spacing:1px;margin-bottom:12px}
+.feature .f-body h3{font-size:26px;font-weight:800;margin-bottom:14px}
+.feature .f-body p{font-size:14px;color:var(--text-dim);margin-bottom:20px}
+.feature .f-body .btn{margin-top:8px;align-self:flex-start}
+
+/* 详情页 */
+.detail-hero{padding:48px 28px 28px;border-bottom:1px solid var(--border)}
+.detail-hero .crumb{font-size:13px;color:var(--text-mute);margin-bottom:16px}
+.detail-hero .crumb a{color:var(--text-dim);text-decoration:none}
+.detail-hero .crumb b{color:var(--gold)}
+.detail-hero h2{font-size:32px;font-weight:800;margin-bottom:16px}
+.detail-hero .d-meta{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--text-dim)}
+.detail-hero .d-meta span{display:flex;align-items:center;gap:6px}
+.detail-body{display:grid;grid-template-columns:1fr 280px;gap:28px;padding:28px}
+.detail-main .d-cover{height:340px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;display:flex;align-items:center;justify-content:center;color:var(--border-light);font-size:48px}
+.detail-main h4{font-size:18px;font-weight:700;margin:24px 0 12px;padding-left:12px;border-left:3px solid var(--gold)}
+.detail-main p{font-size:14px;color:var(--text-dim);margin-bottom:14px}
+.detail-side .side-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.detail-side .side-card h5{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--gold)}
+.detail-side .side-card .row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--text-dim)}
+.detail-side .side-card .row b{color:var(--text);font-weight:600}
+
+/* 页脚 */
+.footer{border-top:1px solid var(--border);padding:32px 28px;display:flex;align-items:center;justify-content:space-between;background:var(--bg-deep)}
+.footer .fl{font-size:13px;color:var(--text-mute)}
+.footer .fr{display:flex;gap:16px;font-size:13px}
+.footer .fr a{color:var(--text-mute);text-decoration:none}
+.footer .fr a:hover{color:var(--gold)}
+
+/* 响应式 */
+@media(max-width:960px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .feature{grid-template-columns:1fr}
+  .detail-body{grid-template-columns:1fr}
+  .hero h2{font-size:32px}
+}
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr}
+  .nav{display:none}
+  .hero .stats{gap:24px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="doc-head">
+    <div class="tag">视觉参考稿 · V1</div>
+    <h1>成果展示广场 · 警务化界面改版</h1>
+    <p>警察蓝主调 · 金色点缀 · 沉稳庄重 · 沉浸式作品展示</p>
+  </div>
+</div>
+
+<!-- ============ 页面一：首页 ============ -->
+<div class="wrap">
+  <div class="demo-frame">
+    <div class="demo-label"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>首页</span><span class="page-name">成果展示广场</span></div>
+
+    <div class="topbar">
+      <div class="logo">
+        <div class="shield">
+          <svg viewBox="0 0 40 44" fill="none">
+            <path d="M20 2 L36 8 V20 C36 32 29 39 20 42 C11 39 4 32 4 20 V8 Z" fill="#1e6fd9" stroke="#3b8bff" stroke-width="1.2"/>
+            <path d="M20 9 L30 13 V21 C30 29 25 34 20 36 C15 34 10 29 10 21 V13 Z" fill="#0a1530" opacity=".35"/>
+            <path d="M20 15 L14 24 L18 24 L17 30 L24 22 L20 22 Z" fill="#e8c984"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <div class="zh">成果展示广场</div>
+          <div class="en">Achievement Plaza</div>
+        </div>
+      </div>
+      <div class="nav">
+        <a class="active" href="#">首页</a>
+        <a href="#">成果库</a>
+        <a href="#">优秀作品</a>
+        <a href="#">传承课例</a>
+        <a href="#">成长档案</a>
+      </div>
+      <div class="right">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input placeholder="搜索成果、作品、作者">
+        </div>
+        <div class="avatar">警</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="grid-bg"></div>
+      <div class="hero-inner">
+        <div class="badge">◆ 警院师生成果展示 · 传承与共享</div>
+        <h2>汇聚警务智慧<br><span class="accent">让每一份成果被看见</span></h2>
+        <p class="sub">这里是警院师生创新成果的展示窗口，汇集课程设计、警务实战、技术开发等优秀作品，传承经验、激发灵感、共享成长。</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#">浏览成果库</a>
+          <a class="btn btn-ghost" href="#">了解成长档案</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="num">128<span>+</span></div><div class="lbl">展示成果</div></div>
+          <div class="stat"><div class="num">36<span>+</span></div><div class="lbl">优秀作品</div></div>
+          <div class="stat"><div class="num">45<span>+</span></div><div class="lbl">传承课例</div></div>
+          <div class="stat"><div class="num">98<span>%</span></div><div class="lbl">成果转化率</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-left:28px;padding-right:28px">
+      <div class="section-head">
+        <div class="t"><span class="bar"></span><h3>精选优秀成果</h3></div>
+        <a class="more" href="#">查看全部 →</a>
+      </div>
+      <div class="filter">
+        <span class="chip active">全部</span>
+        <span class="chip">课程设计</span>
+        <span class="chip">警务实战</span>
+        <span class="chip">技术开发</span>
+        <span class="chip">理论研究</span>
+        <span class="chip">创新创业</span>
+      </div>
+
+      <!-- 精选 banner -->
+      <div class="feature">
+        <div class="f-cover"><div class="ph">◆</div></div>
+        <div class="f-body">
+          <div class="flag">年度最佳 · 金奖</div>
+          <h3>基于大数据的城市治安态势感知系统</h3>
+          <p>利用多源数据融合与可视化分析，构建城市治安风险预警模型，实现重点区域治安态势的实时感知与智能研判。</p>
+          <a class="btn btn-primary" href="#">查看详情</a>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="cover"><span class="rank">TOP 1</span><span class="award">金奖</span></div>
+          <div class="body">
+            <div class="cat">技术开发</div>
+            <h4>城市治安态势感知系统</h4>
+            <p class="desc">多源数据融合与可视化分析，构建风险预警模型。</p>
+            <div class="tags"><span class="tag">大数据</span><span class="tag">可视化</span></div>
+            <div class="meta">
+              <div class="author"><div class="ava">张</div><span>张同学 · 2022级</span></div>
+              <div class="stat"><b>1.2k</b> 浏览</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cover"><span class="rank">TOP 2</span><span class="award">银奖</span></div>
+          <div class="body">
+            <div class="cat">警务实战</div>
+            <h4>模拟警情处置 VR 训练系统</h4>
+            <p class="desc">沉浸式虚拟仿真训练，覆盖常见警情处置流程。</p>
+            <div class="tags"><span class="tag">VR</span><span class="tag">实战训练</span></div>
+            <div class="meta">
+              <div class="author"><div class="ava">李</div><span>李同学 · 2021级</span></div>
+              <div class="stat"><b>986</b> 浏览</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cover"><span class="rank">TOP 3</span><span class="award">铜奖</span></div>
+          <div class="body">
+            <div class="cat">理论研究</div>
+            <h4>基层派出所社区警务创新模式研究</h4>
+            <p class="desc">探索新时代社区警务的数字化转型路径与实践。</p>
+            <div class="tags"><span class="tag">社区警务</span><span class="tag">论文</span></div>
+            <div class="meta">
+              <div class="author"><div class="ava">王</div><span>王同学 · 2022级</span></div>
+              <div class="stat"><b>754</b> 浏览</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cover"><span class="rank">TOP 4</span></div>
+          <div class="body">
+            <div class="cat">创新创业</div>
+            <h4>警务无人机巡检管理平台</h4>
+            <p class="desc">无人机编队协同巡检，提升巡逻防控效率。</p>
+            <div class="tags"><span class="tag">无人机</span><span class="tag">物联网</span></div>
+            <div class="meta">
+              <div class="author"><div class="ava">陈</div><span>陈同学 · 2023级</span></div>
+              <div class="stat"><b>688</b> 浏览</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cover"><span class="rank">TOP 5</span></div>
+          <div class="body">
+            <div class="cat">课程设计</div>
+            <h4>公安信息化课程综合实训案例库</h4>
+            <p class="desc">面向教学实训的典型案例与配套资源整合。</p>
+            <div class="tags"><span class="tag">实训</span><span class="tag">案例库</span></div>
+            <div class="meta">
+              <div class="author"><div class="ava">刘</div><span>刘同学 · 2022级</span></div>
+              <div class="stat"><b>612</b> 浏览</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cover"><span class="rank">TOP 6</span></div>
+          <div class="body">
+            <div class="cat">技术开发</div>
+            <h4>移动警务 App 安全框架设计</h4>
+            <p class="desc">面向移动警务场景的安全认证与数据加密方案。</p>
+            <div class="tags"><span class="tag">安全</span><span class="tag">移动端</span></div>
+            <div class="meta">
+              <div class="author"><div class="ava">赵</div><span>赵同学 · 2021级</span></div>
+              <div class="stat"><b>530</b> 浏览</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="fl">© 2026 成果展示广场 · 警院师生成果展示平台</div>
+      <div class="fr"><a href="#">关于我们</a><a href="#">使用帮助</a><a href="#">意见反馈</a><a href="#">隐私政策</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 页面二：作品详情页 ============ -->
+<div class="wrap">
+  <div class="demo-frame" style="margin-top:40px">
+    <div class="demo-label"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>作品详情页</span><span class="page-name">城市治安态势感知系统</span></div>
+
+    <div class="topbar">
+      <div class="logo">
+        <div class="shield">
+          <svg viewBox="0 0 40 44" fill="none">
+            <path d="M20 2 L36 8 V20 C36 32 29 39 20 42 C11 39 4 32 4 20 V8 Z" fill="#1e6fd9" stroke="#3b8bff" stroke-width="1.2"/>
+            <path d="M20 9 L30 13 V21 C30 29 25 34 20 36 C15 34 10 29 10 21 V13 Z" fill="#0a1530" opacity=".35"/>
+            <path d="M20 15 L14 24 L18 24 L17 30 L24 22 L20 22 Z" fill="#e8c984"/>
+          </svg>
+        </div>
+        <div class="logo-text"><div class="zh">成果展示广场</div><div class="en">Achievement Plaza</div></div>
+      </div>
+      <div class="nav"><a href="#">首页</a><a class="active" href="#">成果库</a><a href="#">优秀作品</a><a href="#">传承课例</a><a href="#">成长档案</a></div>
+      <div class="right"><div class="avatar">警</div></div>
+    </div>
+
+    <div class="detail-hero">
+      <div class="crumb"><a href="#">首页</a> / <a href="#">成果库</a> / <a href="#">技术开发</a> / <b>城市治安态势感知系统</b></div>
+      <h2>基于大数据的城市治安态势感知系统</h2>
+      <div class="d-meta">
+        <span>◆ 金奖 · 年度最佳</span>
+        <span>作者：张同学（2022级）</span>
+        <span>分类：技术开发</span>
+        <span>浏览 1.2k</span>
+      </div>
+    </div>
+
+    <div class="detail-body">
+      <div class="detail-main">
+        <div class="d-cover">◆ 封面图 / 演示视频</div>
+        <h4>作品简介</h4>
+        <p>本系统面向城市治安管理场景，融合公安、交通、社区等多源数据，通过大数据分析与可视化技术，构建城市治安风险预警模型，实现重点区域治安态势的实时感知、智能研判与可视化展示，辅助指挥决策。</p>
+        <h4>技术方案</h4>
+        <p>采用分布式数据采集架构，结合机器学习算法进行风险等级评估，前端使用可视化大屏技术呈现态势热力分布与预警信息，支持多终端实时联动。</p>
+        <h4>创新点</h4>
+        <p>首次将多源异构数据统一建模，提出面向治安场景的时空风险预警算法，实现从数据到决策的闭环。</p>
+      </div>
+      <div class="detail-side">
+        <div class="side-card">
+          <h5>项目信息</h5>
+          <div class="row"><span>成果类型</span><b>技术开发</b></div>
+          <div class="row"><span>所属团队</span><b>智慧警务实验室</b></div>
+          <div class="row"><span>指导教师</span><b>李教授</b></div>
+          <div class="row"><span>完成时间</span><b>2025.06</b></div>
+          <div class="row"><span>状态</span><b style="color:#38bdf8">已发布</b></div>
+        </div>
+        <div class="side-card">
+          <h5>相关标签</h5>
+          <div class="filter" style="margin-bottom:0">
+            <span class="chip">大数据</span><span class="chip">可视化</span><span class="chip">预警模型</span><span class="chip">智慧警务</span>
+          </div>
+        </div>
+        <div class="side-card">
+          <h5>成果转化</h5>
+          <div class="row"><span>沉淀课例</span><b style="color:#d4af6a">已提名</b></div>
+          <div class="row"><span>反馈数</span><b>23 条</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="fl">© 2026 成果展示广场 · 警院师生成果展示平台</div>
+      <div class="fr"><a href="#">关于我们</a><a href="#">使用帮助</a><a href="#">意见反馈</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" style="padding-bottom:60px;text-align:center;color:#6f7f99;font-size:13px;margin-top:40px">
+  以上为界面改版视觉参考稿 · 主色 #1e6fd9 警察蓝 / 点缀 #d4af6a 金 / 底色 #0a1530 深藏蓝
+</div>
+
+</body>
+</html>

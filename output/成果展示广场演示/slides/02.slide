@@ -1,39 +1,54 @@
 <Slide style={{ background: '#FFFFFF', padding: 60 }}>
   <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
     <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>01</Text>
-    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>项目定位</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>项目概述</Text>
   </Box>
-  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 28 }}>五平台闭环的出口与反馈源</Text>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 24 }}>一句话概括 · 目标用户 · 解决问题 · 核心功能</Text>
 
-  <Box style={{ flexDirection: 'row', gap: 24, flex: 1 }}>
-    <Box style={{ flex: 1.4, background: '#0F172A', borderRadius: 16, padding: 36, justifyContent: 'space-between' }}>
-      <Box>
-        <Text style={{ fontSize: 20, color: '#22D3EE', fontWeight: 'bold', letterSpacing: 1 }}>一句话定位</Text>
-        <Text style={{ fontSize: 34, color: '#FFFFFF', fontWeight: 'bold', lineHeight: 1.35, marginTop: 20 }}>
-          展成果、做曝光、<br />收反馈、做传承
-        </Text>
+  <Box style={{ padding: '20px 28px', background: '#0F172A', borderRadius: 14, marginBottom: 24 }}>
+    <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <FAIcon name='quote-left' style={{ fill: '#22D3EE', width: 26, height: 26 }} />
+      <Text style={{ fontSize: 22, color: '#FFFFFF', fontWeight: 'bold', lineHeight: 1.4 }}>
+        成果展示广场是「警院 WeChat 全生态」的成果展示平台，把实训作品集中呈现、让访客体验反馈、让优秀成果沉淀为教学资源。
+      </Text>
+    </Box>
+  </Box>
+
+  <Box style={{ flexDirection: 'row', gap: 20, flex: 1 }}>
+    <Box style={{ flex: 1, padding: 24, background: '#F8FAFC', borderRadius: 14, border: '1px solid #E2E8F0', flexDirection: 'column' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <FAIcon name='users' style={{ fill: '#2563EB', width: 22, height: 22 }} />
+        <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#0F172A' }}>目标用户</Text>
       </Box>
-      <Text style={{ fontSize: 17, color: '#94A3B8', lineHeight: 1.6, marginTop: 28 }}>
-        成果展示广场是「警院 WeChat 全生态五平台」的第四平台，把实训工坊验收的作品与学员自主投稿集中呈现，成为学校技术实训能力对外的展示窗口。
+      <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.7 }}>
+        学员（创作者）<br />老师 / 助教（审核方）<br />管理员（运营方）<br />访客 / 校友（浏览方）
       </Text>
     </Box>
 
-    <Box style={{ flex: 1, flexDirection: 'column', gap: 24 }}>
-      {[
-        { icon: 'eye', t: '展示窗口', d: '校内可见、校外可访问，是实训能力对外的事实出口' },
-        { icon: 'comments', t: '反馈回路', d: '浏览、体验、留言与建议回流作者，驱动作品迭代' },
-        { icon: 'book', t: '传承载体', d: '优秀作品转化为下一届学员的学习素材，闭环自转' },
-      ].map((item) => (
-        <Box key={item.t} style={{ flex: 1, flexDirection: 'row', gap: 18, alignItems: 'flex-start', padding: 22, background: '#F8FAFC', borderRadius: 14, border: '1px solid #E2E8F0' }}>
-          <Box style={{ width: 46, height: 46, borderRadius: 12, background: '#EFF6FF', justifyContent: 'center', alignItems: 'center' }}>
-            <FAIcon name={item.icon} style={{ fill: '#2563EB', width: 24, height: 24 }} />
-          </Box>
-          <Box style={{ flex: 1 }}>
-            <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#0F172A', marginBottom: 6 }}>{item.t}</Text>
-            <Text style={{ fontSize: 16, color: '#64748B', lineHeight: 1.5 }}>{item.d}</Text>
-          </Box>
-        </Box>
-      ))}
+    <Box style={{ flex: 1, padding: 24, background: '#F8FAFC', borderRadius: 14, border: '1px solid #E2E8F0', flexDirection: 'column' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <FAIcon name='exclamation-circle' style={{ fill: '#EA580C', width: 22, height: 22 }} />
+        <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#0F172A' }}>解决的问题</Text>
+      </Box>
+      <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.7 }}>
+        成果无处展示、曝光不足<br />缺少体验反馈、难迭代<br />优秀作品无法沉淀传承<br />内容质量缺乏把关
+      </Text>
     </Box>
+
+    <Box style={{ flex: 1, padding: 24, background: '#F8FAFC', borderRadius: 14, border: '1px solid #E2E8F0', flexDirection: 'column' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <FAIcon name='th-large' style={{ fill: '#0D9488', width: 22, height: 22 }} />
+        <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#0F172A' }}>核心功能</Text>
+      </Box>
+      <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.7 }}>
+        投稿与两级审核<br />展示墙与搜索推荐<br />互动反馈与体验<br />验收认证与课例回流
+      </Text>
+    </Box>
+  </Box>
+
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 24, padding: '16px 24px', background: '#FFF7ED', borderRadius: 12, border: '1px solid #FED7AA' }}>
+    <FAIcon name='info-circle' style={{ fill: '#EA580C', width: 24, height: 24 }} />
+    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#9A3412' }}>特别说明：</Text>
+    <Text style={{ fontSize: 17, color: '#7C2D12', lineHeight: 1.5 }}>本项目未使用任何 AI 技术完成，全部功能由传统软件开发方式实现。</Text>
   </Box>
 </Slide>

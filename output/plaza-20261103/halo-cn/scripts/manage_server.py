@@ -53,6 +53,41 @@ AUTH = "Basic " + base64.b64encode(("%s:%s" % (HALO_USER, HALO_PASS)).encode()).
 CONSOLE = "/apis/api.console.halo.run/v1alpha1/posts"
 CONTENT = "/apis/api.content.halo.run/v1alpha1/posts"
 
+# 「当前用户权限」接口：基于浏览器会话 Cookie 返回当前登录用户的 uiPermissions。
+# 用于校验调用者是否为管理员（拥有 system:posts:manage 或 * 权限）。
+PERMISSIONS = "/apis/api.console.halo.run/v1alpha1/users/-/permissions"
+
+# 允许执行「编辑 / 删除」所需的管理权限（与前端 .is-manager 探测保持一致）。
+MANAGE_PERMS = ("*", "system:posts:manage")
+
+
+def check_admin(cookie):
+    """用请求携带的 Halo 会话 Cookie 向 Halo 校验当前用户是否为管理员。
+
+    返回 (allowed: bool, reason: str)。
+    - 未携带会话 / 会话失效 → 拒绝；
+    - 会话对应的用户 uiPermissions 不含 MANAGE_PERMS → 拒绝；
+    - 校验通过 → 允许。
+    """
+    if not cookie:
+        return False, "缺少登录会话，请先登录后台"
+    req = urllib.request.Request(HALO_BASE + PERMISSIONS, method="GET")
+    req.add_header("Cookie", cookie)
+    req.add_header("Accept", "application/json")
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    try:
+        with opener.open(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode() or "{}")
+    except urllib.error.HTTPError as exc:
+        return False, "会话校验失败（HTTP %d）" % exc.code
+    except Exception as exc:  # noqa: BLE001
+        return False, "会话校验异常：%s" % exc
+
+    ui = data.get("uiPermissions") or []
+    if any(p in MANAGE_PERMS for p in ui):
+        return True, ""
+    return False, "当前账号无管理权限，仅管理员可编辑/删除成果"
+
 
 def halo(method, path, body=None):
     """调用 Halo 接口，返回 (status, 解析后的 JSON 或原始字符串)。"""
@@ -193,6 +228,12 @@ class Handler(BaseHTTPRequestHandler):
         self._send_json(404, {"error": "not found"})
 
     def do_PUT(self):
+        # 编辑 / 删除属于写操作，先做管理员角色校验（基于 Halo 会话 Cookie）。
+        # 普通用户即使绕过前端直接调用本接口，也会在此被 403 拒绝。
+        allowed, reason = check_admin(self.headers.get("Cookie", ""))
+        if not allowed:
+            self._send_json(403, {"error": reason})
+            return
         m = re.fullmatch(r"/api/manage/achievements/([^/]+)/recycle", self.path)
         if m:
             status, data = recycle_achievement(m.group(1))

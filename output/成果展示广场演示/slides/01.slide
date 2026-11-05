@@ -1,27 +1,24 @@
 <Slide style={{ background: '#FFFFFF', padding: 60 }}>
   <Box style={{ position: 'absolute', top: 0, right: 0, width: 640, height: 720, background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)', borderTopLeftRadius: 48 }} />
-  <Box style={{ position: 'absolute', top: 0, right: 0, width: 640, height: 720, background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)', borderTopLeftRadius: 48, opacity: 0.35 }} />
   <Box style={{ position: 'absolute', top: 120, right: 120, width: 220, height: 220, borderRadius: 110, border: '1px solid rgba(255,255,255,0.35)' }} />
   <Box style={{ position: 'absolute', top: 160, right: 160, width: 140, height: 140, borderRadius: 70, background: 'rgba(255,255,255,0.12)' }} />
 
   <Box style={{ position: 'relative', zIndex: 2, flex: 1, justifyContent: 'center' }}>
     <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-      <Box style={{ width: 40, height: 40, borderRadius: 10, background: '#2563EB', justifyContent: 'center', alignItems: 'center' }}>
-        <FAIcon name='shield-alt' style={{ fill: '#FFFFFF', width: 22, height: 22 }} />
+      <Box style={{ padding: '6px 16px', background: '#F59E0B', borderRadius: 10 }}>
+        <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold', letterSpacing: 1 }}>赛道二</Text>
       </Box>
       <Text style={{ fontSize: 18, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>警院 WeChat 全生态 · 第四平台</Text>
     </Box>
 
     <Text style={{ fontSize: 76, fontWeight: 'bold', color: '#0F172A', lineHeight: 1.15 }}>成果展示广场</Text>
-    <Text style={{ fontSize: 28, color: '#2563EB', fontWeight: 'bold', marginTop: 16, lineHeight: 1.3 }}>展成果 · 做曝光 · 收反馈 · 做传承</Text>
+    <Text style={{ fontSize: 26, color: '#2563EB', fontWeight: 'bold', marginTop: 16, lineHeight: 1.3 }}>
+      实训成果一站式展示与反馈平台，让作品被看见、被使用、被传承
+    </Text>
 
     <Box style={{ width: 72, height: 4, background: '#F59E0B', borderRadius: 2, marginTop: 40 }} />
 
-    <Text style={{ fontSize: 18, color: '#64748B', marginTop: 32, lineHeight: 1.6 }}>
-      实训成果的一站式展示与反馈平台，让每一份作品被看见、被使用、被传承
-    </Text>
-
-    <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 32, marginTop: 72 }}>
+    <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 32, marginTop: 60 }}>
       <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <FAIcon name='user' style={{ fill: '#2563EB', width: 18, height: 18 }} />
         <Text style={{ fontSize: 16, color: '#334155' }}>汇报人：冯俞凯</Text>

@@ -65,47 +65,67 @@
           ></span>
         </a>
       </div>
-      <ul th:if="${menu != null} and ${not #lists.isEmpty(menu.menuItems)}" class="hidden items-center gap-8 sm:flex">
-        <li
-          th:each="menuItem : ${menu.menuItems}"
-          class="relative cursor-pointer text-sm font-medium transition-all"
-          x-data="dropdown"
-          @mouseenter="open()"
-          @mouseleave="close()"
-        >
+      <ul id="header-filters" class="hidden items-center gap-2 sm:flex" x-data="categoryFilter">
+        <li>
           <a
-            class="text-gray-600 hover:text-blue-600 dark:text-slate-50 dark:hover:text-gray-300"
-            th:href="@{${menuItem.status.href}}"
-            th:text="${menuItem.status.displayName}"
-            th:target="${menuItem.spec.target?.value}"
-          ></a>
-          <ul
-            th:if="${not #lists.isEmpty(menuItem.children)}"
+            href="/"
+            data-filter="all"
+            @click.prevent="filterByCategory('all', $event)"
+            class="inline-flex h-9 cursor-pointer items-center rounded px-3 font-medium text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-slate-50"
+          >
+            <span class="truncate text-base" th:text="#{common.all}"> </span>
+          </a>
+        </li>
+        <th:block th:with="categories = ${categoryFinder.listAsTree()}">
+          <li
+            x-data="dropdown"
             @mouseenter="open()"
             @mouseleave="close()"
-            x-show="show"
-            x-cloak
-            x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="transform opacity-0 scale-95"
-            x-transition:enter-end="transform opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="transform opacity-100 scale-100"
-            x-transition:leave-end="transform opacity-0 scale-95"
-            class="menu-dropdown absolute left-0 z-10 mt-2 w-40 divide-y divide-gray-50 overflow-hidden rounded bg-white shadow dark:divide-slate-600 dark:bg-slate-700"
+            class="relative cursor-pointer transition-all"
+            th:each="categoryItem,categoryStat : ${categories}"
+            th:if="${categoryItem.spec.displayName != '默认分类'}"
           >
-            <li
-              th:each="childMenuItem : ${menuItem.children}"
-              class="flex w-full items-center text-left text-sm hover:bg-gray-50 dark:hover:bg-slate-600"
+            <div
+              class="group inline-flex h-9 cursor-pointer items-center gap-1 overflow-hidden rounded font-medium text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-slate-50"
             >
               <a
-                class="size-full truncate px-4 py-2 text-gray-600 hover:text-blue-600 dark:text-slate-50 dark:hover:text-gray-300"
-                th:href="@{${childMenuItem.status.href}}"
-                th:text="${childMenuItem.status.displayName}"
-                th:target="${childMenuItem.spec.target?.value}"
-              ></a>
-            </li>
-          </ul>
-        </li>
+                class="truncate px-3 text-base"
+                th:href="@{${categoryItem.status.permalink}}"
+                th:attr="data-filter=${categoryItem.metadata.name}"
+                @click.prevent="filterByCategory($event.currentTarget.dataset.filter, $event)"
+                th:text="${categoryItem.spec.displayName}"
+                th:classappend="${#lists.isEmpty(categoryItem.children) ? '' : '!pr-1'}"
+              >
+              </a>
+              <button
+                th:if="${not #lists.isEmpty(categoryItem.children)}"
+                @click="open()"
+                class="h-full px-2 text-lg group-hover:bg-gray-200 dark:group-hover:bg-slate-600"
+              >
+                <span
+                  class="i-tabler-chevron-right block transition-all duration-300"
+                  x-bind:class="show ? 'rotate-90' : ''"
+                ></span>
+              </button>
+            </div>
+            <ul
+              th:if="${not #lists.isEmpty(categoryItem.children)}"
+              @mouseenter="open()"
+              @mouseleave="close()"
+              x-show="show"
+              x-cloak
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="transform opacity-0 scale-95"
+              x-transition:enter-end="transform opacity-100 scale-100"
+              x-transition:leave="transition ease-in duration-75"
+              x-transition:leave-start="transform opacity-100 scale-100"
+              x-transition:leave-end="transform opacity-0 scale-95"
+              class="absolute left-0 z-10 mt-2 w-60 overflow-hidden rounded bg-white p-2 shadow dark:bg-slate-800"
+            >
+              <li th:replace="~{modules/category-tree :: single(categories=${categoryItem.children})}" />
+            </ul>
+          </li>
+        </th:block>
       </ul>
     </div>
     <div class="flex items-center">
@@ -262,27 +282,40 @@
         ></button>
         <h2 class="text-sm font-medium text-gray-600 dark:text-slate-300" th:text="#{fragment.header.menu}"></h2>
       </div>
-      <nav class="mt-6">
+      <nav class="mt-6" x-data="categoryFilter">
         <ul class="-my-2 divide-y divide-gray-100 text-sm text-gray-800 dark:divide-slate-800 dark:text-slate-100">
-          <li th:each="menuItem : ${menu.menuItems}">
+          <li>
             <a
               class="flex items-center justify-between gap-1 py-2"
-              th:href="@{${menuItem.status.href}}"
-              th:target="${menuItem.spec.target?.value}"
+              href="/"
+              data-filter="all"
+              @click.prevent="filterByCategory('all', $event); open = false"
             >
-              <span th:text="${menuItem.status.displayName}"></span>
+              <span th:text="#{common.all}"></span>
             </a>
-            <ul class="divide-y divide-gray-100 dark:divide-slate-800" th:if="${not #lists.isEmpty(menuItem.children)}">
-              <li th:each="childMenuItem : ${menuItem.children}" class="flex w-full items-center text-left text-sm">
-                <a
-                  class="size-full truncate px-4 py-2 text-gray-600 dark:text-slate-200"
-                  th:href="@{${childMenuItem.status.href}}"
-                  th:text="${childMenuItem.status.displayName}"
-                  th:target="${childMenuItem.spec.target?.value}"
-                ></a>
-              </li>
-            </ul>
           </li>
+          <th:block th:with="categories = ${categoryFinder.listAsTree()}">
+            <li th:each="categoryItem,categoryStat : ${categories}" th:if="${categoryItem.spec.displayName != '默认分类'}">
+              <a
+                class="flex items-center justify-between gap-1 py-2"
+                th:href="@{${categoryItem.status.permalink}}"
+                th:attr="data-filter=${categoryItem.metadata.name}"
+                @click.prevent="filterByCategory($event.currentTarget.dataset.filter, $event); open = false"
+              >
+                <span th:text="${categoryItem.spec.displayName}"></span>
+              </a>
+              <ul class="divide-y divide-gray-100 dark:divide-slate-800" th:if="${not #lists.isEmpty(categoryItem.children)}">
+                <li th:each="childMenuItem : ${categoryItem.children}" class="flex w-full items-center text-left text-sm">
+                  <a
+                    class="size-full truncate px-4 py-2 text-gray-600 dark:text-slate-200"
+                    th:href="@{${childMenuItem.status.permalink}}"
+                    th:text="${childMenuItem.spec.displayName}"
+                    th:target="${childMenuItem.spec.target?.value}"
+                  ></a>
+                </li>
+              </ul>
+            </li>
+          </th:block>
         </ul>
       </nav>
     </div>
@@ -303,8 +336,6 @@
     class="mx-auto mt-6 grid max-w-7xl grid-cols-1 gap-6 px-4 md:grid-cols-[1fr_18rem] lg:px-6"
   >
     <div class="z-0 min-w-0">
-      <th:block th:replace="~{modules/category-filter}" />
-
       <div
         id="post-list"
         th:if="${posts.total gt 0}"

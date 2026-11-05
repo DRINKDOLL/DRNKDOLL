@@ -3,19 +3,23 @@
 ## 运行网页的固定指令
 
 - 用户说「运行 / 启动 / 打开广场」等指令时，直接启动「警院成果展示广场」Halo 实例并打开首页预览。
-- 启动方式：**优先用 PowerShell `Start-Process` 独立启动**（java 进程由 Windows 独立托管，不会被后台任务层回收，实例可稳定常驻）。用 `run_in_background` 启动时，任务一旦报退出码通知，任务层会连带回收 java 子进程，导致"启动成功→过一会儿打不开"。
-- Start-Process 启动要点（PowerShell）：
-  1. 先 `Remove-Item Env:HTTP_PROXY/HTTPS_PROXY/http_proxy/https_proxy -ErrorAction SilentlyContinue`，否则 Start-Process 复制环境时大小写键冲突报错「已添加项 http_proxy/HTTP_PROXY」。
-  2. stdout/stderr 必须分开重定向（不能指向同一文件），否则报错「RedirectStandardOutput 和 RedirectStandardError 相同」。
-  3. 命令：
-     ```
-     $java = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\tools\jdk-21.0.13.0.2+1\bin\java.exe"
-     $jar  = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\jars\halo-2.27.2.jar"
-     $workdir = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-cn"
-     $args = @("-Xms256m","-Xmx512m","-Dfile.encoding=UTF-8","-Dsun.jnu.encoding=UTF-8","-Duser.language=zh","-Duser.country=CN","-Duser.timezone=Asia/Shanghai","-jar",$jar,"--spring.config.additional-location=file:./config/","--server.port=8092","--server.address=0.0.0.0")
-     Start-Process -FilePath $java -ArgumentList $args -WorkingDirectory $workdir -RedirectStandardOutput "$workdir\logs\halo.out" -RedirectStandardError "$workdir\logs\halo.err" -PassThru -WindowStyle Hidden
-     ```
-  4. 注意：`config/application.yaml` 里已有端口/中文等配置，命令行 `--server.port/--server.address` 覆盖即可；不要依赖 `&` 后台（会随命令会话中断被连带杀掉）。
+- 启动方式：**优先用 PowerShell `Start-Process` 独立启动，且【不要带 `-RedirectStandardOutput/-RedirectStandardError`】**（java 进程由 Windows 独立托管，不会被后台任务层回收；Halo 自己用 logback 写日志到 `run/halo.log`，不依赖 stdout 重定向）。这是唯一稳定可靠的方式，已实测验证。
+  - 曾踩过的两个坑（都导致「启动→过一会儿进程消失」）：
+    1. `run_in_background` 后台任务启动的 java 进程，在任务被判 failed（退出码 1/127）后会被任务层连带回收，进程在 Spring 初始化极早期（「No active profile set」或「Finished repository scanning」）就消失。
+    2. `Start-Process` 若带了 `-RedirectStandardOutput/-RedirectStandardError`，PowerShell 会话一结束重定向句柄断开，会让 java 在 R2DBC 初始化前静默退出。
+  - Start-Process 正确命令（PowerShell）：
+    1. 先 `Remove-Item Env:HTTP_PROXY/HTTPS_PROXY/http_proxy/https_proxy -ErrorAction SilentlyContinue`（否则复制环境时大小写键冲突报「已添加项 http_proxy/HTTP_PROXY」）。
+    2. 命令（**不带任何重定向参数**）：
+       ```
+       $java = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\tools\jdk-21.0.13.0.2+1\bin\java.exe"
+       $jar  = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\jars\halo-2.27.2.jar"
+       $workdir = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-cn"
+       $args = @("-Xms256m","-Xmx512m","-Dfile.encoding=UTF-8","-Dsun.jnu.encoding=UTF-8","-Duser.language=zh","-Duser.country=CN","-Duser.timezone=Asia/Shanghai","-jar",$jar,"--spring.config.additional-location=file:./config/","--server.port=8092","--server.address=0.0.0.0")
+       Start-Process -FilePath $java -ArgumentList $args -WorkingDirectory $workdir -PassThru -WindowStyle Hidden
+       ```
+    3. 启动后 java 进程 PID 是启动器返回的 `$p.Id`；实际监听进程 PID 会不同（java.exe 会 fork），用 `tasklist | grep java` + `netstat -ano | grep :8092` 确认真实监听 PID。
+    4. 日志看 `halo-cn/run/halo.log`（logback 写入，比 `logs/halo.out` 更可靠，因为没重定向时 stdout 不落盘）。
+  - 注意：`config/application.yaml` 里已有端口/中文等配置，命令行 `--server.port/--server.address` 覆盖即可；不要依赖 `&` 后台（会随命令会话中断被连带杀掉）。
 - 启动命令（在 `output/plaza-20261103/halo-cn/` 下），**java.exe 与 jar 一律用绝对路径**（相对路径 `../halo-lab/...` 在后台任务里偶发「命令未找到」退出码 127，导致进程没起来）：
   ```
   cd "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-cn" && \

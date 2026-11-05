@@ -177,6 +177,7 @@
           return fetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: method === 'PUT' ? JSON.stringify(body) : undefined
           }).then(function (resp) {
             return resp.text().then(function (txt) {
