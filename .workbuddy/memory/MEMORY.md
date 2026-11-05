@@ -3,7 +3,19 @@
 ## 运行网页的固定指令
 
 - 用户说「运行 / 启动 / 打开广场」等指令时，直接启动「警院成果展示广场」Halo 实例并打开首页预览。
-- 启动方式：**必须用后台任务（run_in_background）启动**，不要用 `&` 后台（会随命令会话中断被连带杀掉，导致 127.0.0.1:8092 打不开）。
+- 启动方式：**优先用 PowerShell `Start-Process` 独立启动**（java 进程由 Windows 独立托管，不会被后台任务层回收，实例可稳定常驻）。用 `run_in_background` 启动时，任务一旦报退出码通知，任务层会连带回收 java 子进程，导致"启动成功→过一会儿打不开"。
+- Start-Process 启动要点（PowerShell）：
+  1. 先 `Remove-Item Env:HTTP_PROXY/HTTPS_PROXY/http_proxy/https_proxy -ErrorAction SilentlyContinue`，否则 Start-Process 复制环境时大小写键冲突报错「已添加项 http_proxy/HTTP_PROXY」。
+  2. stdout/stderr 必须分开重定向（不能指向同一文件），否则报错「RedirectStandardOutput 和 RedirectStandardError 相同」。
+  3. 命令：
+     ```
+     $java = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\tools\jdk-21.0.13.0.2+1\bin\java.exe"
+     $jar  = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\jars\halo-2.27.2.jar"
+     $workdir = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-cn"
+     $args = @("-Xms256m","-Xmx512m","-Dfile.encoding=UTF-8","-Dsun.jnu.encoding=UTF-8","-Duser.language=zh","-Duser.country=CN","-Duser.timezone=Asia/Shanghai","-jar",$jar,"--spring.config.additional-location=file:./config/","--server.port=8092","--server.address=0.0.0.0")
+     Start-Process -FilePath $java -ArgumentList $args -WorkingDirectory $workdir -RedirectStandardOutput "$workdir\logs\halo.out" -RedirectStandardError "$workdir\logs\halo.err" -PassThru -WindowStyle Hidden
+     ```
+  4. 注意：`config/application.yaml` 里已有端口/中文等配置，命令行 `--server.port/--server.address` 覆盖即可；不要依赖 `&` 后台（会随命令会话中断被连带杀掉）。
 - 启动命令（在 `output/plaza-20261103/halo-cn/` 下），**java.exe 与 jar 一律用绝对路径**（相对路径 `../halo-lab/...` 在后台任务里偶发「命令未找到」退出码 127，导致进程没起来）：
   ```
   cd "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-cn" && \
@@ -17,7 +29,10 @@
     --server.port=8092 --server.address=0.0.0.0 > logs/halo.out 2>&1
   ```
 - 服务信息：首页 http://127.0.0.1:8092/ ；管理后台 http://127.0.0.1:8092/console；局域网 http://10.1.1.239:8092/。
-- 登录凭据：用户名 admin / 密码 Passw0rd!2026。用户要求：每次「运行」启动/打开网页后，务必以「用户名：admin / 密码：Passw0rd!2026」这样清晰易读的格式一并发出来。
+- 登录凭据（两个账号，每次「运行」都要一并列出）：
+  - 管理员：用户名 admin / 密码 Passw0rd!2026（可访问 /console 管理后台）
+  - 普通用户：用户名 student / 密码 Student!2026（角色 post-author「作者」，登录后跳转 /uc 个人中心，**不能访问管理后台**，适合日常登录）
+  - 用户要求：每次「运行」启动/打开网页后，务必把两个账号以「用户名：xxx / 密码：xxx」清晰易读的格式一并发出，并注明哪个是管理员、哪个是普通用户。
 - 启动后轮询首页直到 HTTP 200，再用 present_files 打开 http://127.0.0.1:8092/ 预览。
 - 端口被占先确认旧进程；H2 文件被锁时报 MVStoreException 时，先确保 8092 端口真正释放再启动。
 - 后台任务的退出码通知（127 / 1073807364 等）不一定是真失败：Java 进程可能已独立存活继续初始化。收到失败通知后，务必先 `curl` 实测首页 HTTP 状态 + `tasklist` 查 java 进程，再决定是否重启，不要仅凭退出码误判。

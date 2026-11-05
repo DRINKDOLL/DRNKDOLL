@@ -1,0 +1,50 @@
+<Slide style={{ background: '#FFFFFF', padding: 60 }}>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+    <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>07</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>管理后台与数据看板</Text>
+  </Box>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 28 }}>运营有抓手、治理有留痕、决策有数据</Text>
+
+  <Box style={{ flexDirection: 'row', gap: 24, flex: 1 }}>
+    <Box style={{ flex: 1.1, flexDirection: 'column', gap: 16 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#0F172A' }}>后台核心模块</Text>
+      {[
+        { icon: 'tasks', t: '审核队列', d: '初审 / 终审双视图，领取锁定、批量通过' },
+        { icon: 'folder-open', t: '作品管理', d: '检索、强制下架、恢复、置顶' },
+        { icon: 'bullhorn', t: '推荐位与运营', d: '编辑推荐、分类标签维护、榜单配置' },
+        { icon: 'search', t: '外链巡检', d: '每日全量巡检，失效自动告警与归档' },
+      ].map((item) => (
+        <Box key={item.t} style={{ flexDirection: 'row', gap: 16, alignItems: 'flex-start', padding: '16px 18px', background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0' }}>
+          <Box style={{ width: 40, height: 40, borderRadius: 10, background: '#EFF6FF', justifyContent: 'center', alignItems: 'center' }}>
+            <FAIcon name={item.icon} style={{ fill: '#2563EB', width: 20, height: 20 }} />
+          </Box>
+          <Box style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: 'bold', color: '#0F172A', marginBottom: 4 }}>{item.t}</Text>
+            <Text style={{ fontSize: 14, color: '#64748B', lineHeight: 1.45 }}>{item.d}</Text>
+          </Box>
+        </Box>
+      ))}
+    </Box>
+
+    <Box style={{ flex: 0.9, background: '#0F172A', borderRadius: 16, padding: 30, flexDirection: 'column' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 22 }}>
+        <FAIcon name='chart-line' style={{ fill: '#22D3EE', width: 26, height: 26 }} />
+        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#FFFFFF' }}>数据看板</Text>
+      </Box>
+      {[
+        { k: '审核效率', v: '待审积压 · 平均时长 · 驳回率' },
+        { k: '内容供给', v: '上墙总数 · 类型分布 · 验收占比' },
+        { k: '互动反馈', v: '留言量 · 回复率 · 举报处置率' },
+        { k: '曝光转化', v: 'PV/UV · Demo 点击 · 访客占比' },
+      ].map((item) => (
+        <Box key={item.k} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#22D3EE' }}>{item.k}</Text>
+          <Text style={{ fontSize: 14, color: '#94A3B8' }}>{item.v}</Text>
+        </Box>
+      ))}
+      <Text style={{ fontSize: 14, color: '#64748B', marginTop: 20, lineHeight: 1.5 }}>
+        按自然日统计，T+1 出数；看板数字与后台明细逐条核对，误差为 0。
+      </Text>
+    </Box>
+  </Box>
+</Slide>

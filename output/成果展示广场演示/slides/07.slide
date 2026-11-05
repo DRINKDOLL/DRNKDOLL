@@ -1,0 +1,47 @@
+<Slide style={{ background: '#FFFFFF', padding: 60 }}>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+    <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>06</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>验收认证与传承</Text>
+  </Box>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 28 }}>让成果可信、让优秀作品沉淀为教学资源</Text>
+
+  <Box style={{ flexDirection: 'row', gap: 24, flex: 1 }}>
+    <Box style={{ flex: 1, background: '#EFF6FF', borderRadius: 16, padding: 30, flexDirection: 'column', justifyContent: 'space-between' }}>
+      <Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+          <Box style={{ width: 44, height: 44, borderRadius: 12, background: '#2563EB', justifyContent: 'center', alignItems: 'center' }}>
+            <FAIcon name='award' style={{ fill: '#FFFFFF', width: 24, height: 24 }} />
+          </Box>
+          <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1E40AF' }}>验收认证徽章</Text>
+        </Box>
+        <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.65 }}>
+          工坊验收通过的作品，自动获得「已验收」徽章，附带验收学期、批次与百分制评分。徽章不可手动标注，评分前须经作者授权公开。
+        </Text>
+      </Box>
+      <Box style={{ marginTop: 20, padding: '14px 18px', background: '#FFFFFF', borderRadius: 12, border: '1px solid #BFDBFE' }}>
+        <Text style={{ fontSize: 15, color: '#64748B', lineHeight: 1.55 }}>
+          「评分为实训工坊验收结论，不代表广场评价，不参与任何成绩二次计算」
+        </Text>
+      </Box>
+    </Box>
+
+    <Box style={{ flex: 1, background: '#FAF5FF', borderRadius: 16, padding: 30, flexDirection: 'column', justifyContent: 'space-between' }}>
+      <Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+          <Box style={{ width: 44, height: 44, borderRadius: 12, background: '#7C3AED', justifyContent: 'center', alignItems: 'center' }}>
+            <FAIcon name='book-open' style={{ fill: '#FFFFFF', width: 24, height: 24 }} />
+          </Box>
+          <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#5B21B6' }}>课例回流传承</Text>
+        </Box>
+        <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.65 }}>
+          老师可将优秀作品勾选为「教学课例」，指定用途与目标课程，推送至自学平台建课。课例上线后回填跳转链接，作品页展示引用关系。
+        </Text>
+      </Box>
+      <Box style={{ marginTop: 20, padding: '14px 18px', background: '#FFFFFF', borderRadius: 12, border: '1px solid #DDD6FE' }}>
+        <Text style={{ fontSize: 15, color: '#64748B', lineHeight: 1.55 }}>
+          从「展示—反馈—迭代」到「沉淀—传承」，闭环在课例回流这一步完成自转。
+        </Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

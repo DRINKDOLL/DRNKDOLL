@@ -1,0 +1,41 @@
+<Slide style={{ background: '#FFFFFF', padding: 60 }}>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+    <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>02</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>目标用户与角色</Text>
+  </Box>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 28 }}>一套平台，服务校内校外的多重角色</Text>
+
+  <Box style={{ flexDirection: 'row', gap: 24, flex: 1 }}>
+    <Box style={{ flex: 1, flexDirection: 'column', gap: 24 }}>
+      {[
+        { icon: 'user-graduate', t: '学员', tag: '创作者', c: '#2563EB', bg: '#EFF6FF', d: '实名投稿作品，管理版本、维护 Demo 链接，查看本人作品数据' },
+        { icon: 'chalkboard-teacher', t: '老师 / 助教', tag: '审核方', c: '#EA580C', bg: '#FFF7ED', d: '初审与终审把关，勾选优秀作品转为教学课例' },
+        { icon: 'user-shield', t: '管理员', tag: '运营方', c: '#0D9488', bg: '#F0FDFA', d: '配置推荐位、治理内容、维护分类标签、查看数据看板' },
+        { icon: 'globe', t: '访客 / 校友', tag: '浏览方', c: '#7C3AED', bg: '#FAF5FF', d: '免登录浏览与点赞留言，校友可维护本人作品字段' },
+      ].map((item) => (
+        <Box key={item.t} style={{ flex: 1, flexDirection: 'row', gap: 18, alignItems: 'flex-start', padding: 22, background: '#FFFFFF', borderRadius: 14, border: '1px solid #E2E8F0' }}>
+          <Box style={{ width: 48, height: 48, borderRadius: 12, background: item.bg, justifyContent: 'center', alignItems: 'center' }}>
+            <FAIcon name={item.icon} style={{ fill: item.c, width: 24, height: 24 }} />
+          </Box>
+          <Box style={{ flex: 1 }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+              <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#0F172A' }}>{item.t}</Text>
+              <Box style={{ padding: '3px 10px', background: item.bg, borderRadius: 10 }}>
+                <Text style={{ fontSize: 14, color: item.c, fontWeight: 'bold' }}>{item.tag}</Text>
+              </Box>
+            </Box>
+            <Text style={{ fontSize: 16, color: '#64748B', lineHeight: 1.5 }}>{item.d}</Text>
+          </Box>
+        </Box>
+      ))}
+    </Box>
+
+    <Box style={{ flex: 0.9, background: 'linear-gradient(180deg, #2563EB 0%, #06B6D4 100%)', borderRadius: 16, padding: 32, justifyContent: 'center' }}>
+      <FAIcon name='lock' style={{ fill: 'rgba(255,255,255,0.9)', width: 40, height: 40, marginBottom: 20 }} />
+      <Text style={{ fontSize: 24, color: '#FFFFFF', fontWeight: 'bold', lineHeight: 1.4, marginBottom: 16 }}>统一身份，一次认证</Text>
+      <Text style={{ fontSize: 17, color: 'rgba(255,255,255,0.92)', lineHeight: 1.65 }}>
+        平台不单独建账号、不重复实名认证，全部复用「一号通」鉴权能力。访客无需登录即可浏览，实名后才能参与校内讨论区。
+      </Text>
+    </Box>
+  </Box>
+</Slide>

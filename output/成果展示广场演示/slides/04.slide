@@ -1,0 +1,28 @@
+<Slide style={{ background: '#FFFFFF', padding: 60 }}>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+    <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>03</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>核心功能总览</Text>
+  </Box>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 28 }}>六大功能模块，覆盖从投稿到传承的完整链路</Text>
+
+  <Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20, flex: 1 }}>
+    {[
+      { icon: 'file-upload', t: '投稿与审核', d: '三端统一表单，两级先审后发', c: '#2563EB' },
+      { icon: 'th-large', t: '展示墙与搜索', d: '分类、标签、搜索、推荐位', c: '#EA580C' },
+      { icon: 'comments', t: '互动与反馈', d: '实名讨论 + 访客留言 + 体验反馈', c: '#0D9488' },
+      { icon: 'award', t: '验收认证', d: '工坊徽章、评分与导师评语', c: '#F59E0B' },
+      { icon: 'book-open', t: '课例回流', d: '优秀作品转化为教学课例', c: '#7C3AED' },
+      { icon: 'chart-line', t: '管理后台与看板', d: '审核治理、数据看板、外链巡检', c: '#334155' },
+    ].map((item) => (
+      <Box key={item.t} style={{ width: '31%', flexDirection: 'row', gap: 16, alignItems: 'flex-start', padding: 24, background: '#F8FAFC', borderRadius: 14, border: '1px solid #E2E8F0' }}>
+        <Box style={{ width: 46, height: 46, borderRadius: 12, background: item.c + '1A', justifyContent: 'center', alignItems: 'center' }}>
+          <FAIcon name={item.icon} style={{ fill: item.c, width: 24, height: 24 }} />
+        </Box>
+        <Box style={{ flex: 1 }}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#0F172A', marginBottom: 6 }}>{item.t}</Text>
+          <Text style={{ fontSize: 15, color: '#64748B', lineHeight: 1.5 }}>{item.d}</Text>
+        </Box>
+      </Box>
+    ))}
+  </Box>
+</Slide>

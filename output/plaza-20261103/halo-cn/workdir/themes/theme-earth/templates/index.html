@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+<meta name="generator" content="警院成果展示广场" />
 <link th:unless="${#strings.isEmpty(site.logo)}" rel="preload" th:href="${site.logo}" as="image" />
 <script th:inline="javascript">
   window.i18nResources = {
@@ -395,8 +396,7 @@
     <span class="mx-auto block max-w-7xl px-4 text-center text-sm text-gray-500 dark:text-slate-300 lg:px-6">
       ©
       <th:block th:text="${#dates.format(new java.util.Date().getTime(), 'yyyy')}" />
-      <a href="/" class="hover:underline" th:text="${site.title}"></a> 版权所有，保留所有权利。技术支持：
-      <a href="https://halo.run" class="hover:underline" target="_blank">Halo</a>.
+      <a href="/" class="hover:underline" th:text="${site.title}"></a> 版权所有，保留所有权利。
     </span>
     <span class="mx-auto block max-w-7xl px-4 text-center text-sm text-gray-500 dark:text-slate-300 lg:px-6">
       <halo:footer />
@@ -456,8 +456,7 @@
       <span class="text-sm text-gray-500 dark:text-slate-300 sm:text-center">
         ©
         <th:block th:text="${#dates.format(new java.util.Date().getTime(), 'yyyy')}" />
-        <a href="/" class="hover:underline" th:text="${site.title}"></a> 版权所有，保留所有权利。技术支持：
-        <a href="https://halo.run" class="hover:underline" target="_blank">Halo</a>.
+        <a href="/" class="hover:underline" th:text="${site.title}"></a> 版权所有，保留所有权利。
       </span>
 
       <div class="flex flex-col gap-1 sm:flex-row">

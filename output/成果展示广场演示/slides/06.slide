@@ -1,0 +1,54 @@
+<Slide style={{ background: '#FFFFFF', padding: 60 }}>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+    <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>05</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>作品详情与互动体验</Text>
+  </Box>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 28 }}>一个作品页，承载展示、体验与反馈的完整闭环</Text>
+
+  <Box style={{ flexDirection: 'row', gap: 24, flex: 1 }}>
+    <Box style={{ flex: 1.15, flexDirection: 'column', gap: 18 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#0F172A' }}>详情页结构</Text>
+      {[
+        '封面与状态徽章 · 名称与一句话简介',
+        '作者与团队（含指导老师）',
+        '体验区：Demo 按钮 / 视频 / 截图轮播',
+        '详细说明 · 技术栈与分类',
+        '讨论区与访客留言区',
+      ].map((t) => (
+        <Box key={t} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: '14px 18px', background: '#F8FAFC', borderRadius: 12 }}>
+          <Box style={{ width: 8, height: 8, borderRadius: 4, background: '#2563EB' }} />
+          <Text style={{ fontSize: 17, color: '#334155' }}>{t}</Text>
+        </Box>
+      ))}
+    </Box>
+
+    <Box style={{ width: 1, background: '#E2E8F0' }} />
+
+    <Box style={{ flex: 1.3, flexDirection: 'column', gap: 22 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#0F172A' }}>互动与反馈</Text>
+
+      <Box style={{ flexDirection: 'row', gap: 16 }}>
+        <Box style={{ flex: 1, padding: 22, background: '#EFF6FF', borderRadius: 14 }}>
+          <FAIcon name='user' style={{ fill: '#2563EB', width: 26, height: 26, marginBottom: 12 }} />
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1E40AF', marginBottom: 8 }}>实名讨论区</Text>
+          <Text style={{ fontSize: 15, color: '#334155', lineHeight: 1.55 }}>一级评论 + 二级回复，支持 @ 提及、点赞、举报</Text>
+        </Box>
+        <Box style={{ flex: 1, padding: 22, background: '#FAF5FF', borderRadius: 14 }}>
+          <FAIcon name='globe' style={{ fill: '#7C3AED', width: 26, height: 26, marginBottom: 12 }} />
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#5B21B6', marginBottom: 8 }}>访客留言区</Text>
+          <Text style={{ fontSize: 15, color: '#334155', lineHeight: 1.55 }}>非实名独立留言，机审 + 抽审，作者可回复一次</Text>
+        </Box>
+      </Box>
+
+      <Box style={{ padding: 22, background: '#F0FDFA', borderRadius: 14 }}>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <FAIcon name='clipboard-check' style={{ fill: '#0D9488', width: 22, height: 22 }} />
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#134E4A' }}>体验反馈表单</Text>
+        </Box>
+        <Text style={{ fontSize: 15, color: '#334155', lineHeight: 1.55 }}>
+          结构化收集「能否运行 / 有无报错 / 建议」，仅作者与管理员可见，作者可标记「已处理」，形成作品迭代闭环。
+        </Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

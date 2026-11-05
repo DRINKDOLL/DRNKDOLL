@@ -1,0 +1,20 @@
+<Slide style={{ background: '#0F172A', padding: 60 }}>
+  <Box style={{ position: 'absolute', top: 0, left: 0, width: 1280, height: 720, background: 'linear-gradient(135deg, #2563EB 0%, #06B6D4 100%)', opacity: 0.18 }} />
+  <Box style={{ position: 'relative', zIndex: 2, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <Text style={{ fontSize: 60, fontWeight: 'bold', color: '#FFFFFF', lineHeight: 1.25, textAlign: 'center' }}>
+      让每一份成果<br />被看见、被使用、被传承
+    </Text>
+
+    <Box style={{ width: 64, height: 4, background: '#22D3EE', borderRadius: 2, marginTop: 40 }} />
+
+    <Text style={{ fontSize: 20, color: '#94A3B8', marginTop: 36, textAlign: 'center' }}>
+      感谢聆听 · 敬请指正
+    </Text>
+
+    <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 32, marginTop: 48 }}>
+      <Text style={{ fontSize: 16, color: '#CBD5E1' }}>冯俞凯</Text>
+      <Box style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.3)' }} />
+      <Text style={{ fontSize: 16, color: '#CBD5E1' }}>26级网络安全与执法二区队</Text>
+    </Box>
+  </Box>
+</Slide>

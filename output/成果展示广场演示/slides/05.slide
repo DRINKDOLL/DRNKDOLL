@@ -1,0 +1,60 @@
+<Slide style={{ background: '#FFFFFF', padding: 60 }}>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+    <Text style={{ fontSize: 15, color: '#2563EB', fontWeight: 'bold', letterSpacing: 2 }}>04</Text>
+    <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#0F172A' }}>投稿与审核</Text>
+  </Box>
+  <Text style={{ fontSize: 18, color: '#64748B', marginBottom: 32 }}>从提交到上墙，全程先审后发、留痕可溯</Text>
+
+  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 0, marginBottom: 40 }}>
+    {[
+      { n: '1', t: '自主投稿', d: '填表单、传素材' },
+      { n: '2', t: '系统校验', d: '必填项 + 敏感词预检' },
+      { n: '3', t: '助教初审', d: '素材、涉密、侵权' },
+      { n: '4', t: '老师终审', d: '放行或驳回' },
+      { n: '5', t: '上墙展示', d: '进入列表与推荐' },
+    ].map((s, i) => (
+      <Box key={s.n} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        <Box style={{ flex: 1, flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 8px' }}>
+          <Box style={{ width: 54, height: 54, borderRadius: 27, background: i === 4 ? '#F59E0B' : '#2563EB', justifyContent: 'center', alignItems: 'center', marginBottom: 14 }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#FFFFFF' }}>{s.n}</Text>
+          </Box>
+          <Text style={{ fontSize: 19, fontWeight: 'bold', color: '#0F172A', marginBottom: 4 }}>{s.t}</Text>
+          <Text style={{ fontSize: 14, color: '#64748B', lineHeight: 1.4 }}>{s.d}</Text>
+        </Box>
+        {i < 4 && (
+          <FAIcon name='arrow-right' style={{ fill: '#94A3B8', width: 20, height: 20 }} />
+        )}
+      </Box>
+    ))}
+  </Box>
+
+  <Box style={{ flexDirection: 'row', gap: 24, flex: 1 }}>
+    <Box style={{ flex: 1, padding: 26, background: '#EFF6FF', borderRadius: 14, border: '1px solid #BFDBFE' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <FAIcon name='pen' style={{ fill: '#2563EB', width: 22, height: 22 }} />
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E40AF' }}>双通道投稿</Text>
+      </Box>
+      <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.6 }}>
+        默认通道：实名学员自主投稿，同样需过审；<br />认证通道：工坊验收项目自动带入结论，获得「已验收」徽章与评分。
+      </Text>
+    </Box>
+    <Box style={{ flex: 1, padding: 26, background: '#FFF7ED', borderRadius: 14, border: '1px solid #FED7AA' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <FAIcon name='shield-alt' style={{ fill: '#EA580C', width: 22, height: 22 }} />
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#9A3412' }}>质量保障</Text>
+      </Box>
+      <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.6 }}>
+        提交后 24 小时内完成终审；驳回必须给出原因与修改建议；全程审核记录不可删除，随时可回溯。
+      </Text>
+    </Box>
+    <Box style={{ flex: 1, padding: 26, background: '#F0FDFA', borderRadius: 14, border: '1px solid #99F6E4' }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <FAIcon name='clock' style={{ fill: '#0D9488', width: 22, height: 22 }} />
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#134E4A' }}>版本与生命周期</Text>
+      </Box>
+      <Text style={{ fontSize: 16, color: '#334155', lineHeight: 1.6 }}>
+        支持多版本更新与原子切换；下架只撤展示不删数据，可申请恢复；彻底删除需管理员二次确认。
+      </Text>
+    </Box>
+  </Box>
+</Slide>
