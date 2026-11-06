@@ -57,6 +57,16 @@ ROLE_MAP = {
 }
 DEFAULT_HALO_ROLE = "guest"
 
+# Halo 角色权限等级。仅用于「登录同步不降权」判定：
+#   POST /users/{name}/permissions 是**替换**语义（把用户角色整体换成请求集合），
+#   若每次登录都无条件按论坛角色同步，论坛侧为 student（→guest）的账号会把本地
+#   手工授予的管理员/作者角色冲掉。等级低于现有最高角色时一律跳过，保护既有权限。
+ROLE_RANK = {
+    "super-role": 100,   # 超级管理员（verbs/resources/apiGroups 全 *）
+    "post-author": 50,   # 作者（内容管理）
+    "guest": 10,         # 访客（只读）
+}
+
 # 请求超时（秒）。
 CLIENT_TIMEOUT = 15
 
@@ -75,6 +85,9 @@ class UnifiedLoginResult:
     # Halo 本地映射结果
     halo_username: str = ""
     halo_role: str = ""
+    # 本次登录后该账号「实际生效」的角色（可能是本地已有的更高角色，
+    # 而非论坛角色映射值——登录同步不降权，故两者可能不同）。
+    effective_role: str = ""
     user_created: bool = False
     # 错误信息（失败时给出，供排障；对外统一提示防枚举）
     reason: str = ""
@@ -139,6 +152,54 @@ def map_role(forum_role: str) -> str:
     return ROLE_MAP.get((forum_role or "").strip().lower(), DEFAULT_HALO_ROLE)
 
 
+def get_user_roles(username: str) -> list:
+    """读取 Halo 用户当前角色名列表。
+
+    GET /users/{name} 返回 {"user": {...}, "roles": [{...Role...}]}，
+    角色名在 roles[].metadata.name，同时也是 role-names 注解的内容。
+    """
+    status, body = _halo_request("GET", HALO_USERS_PATH + "/" + username)
+    if status != 200 or not isinstance(body, dict):
+        return []
+    names = []
+    for r in (body.get("roles") or []):
+        if isinstance(r, dict):
+            n = (r.get("metadata") or {}).get("name")
+            if n:
+                names.append(n)
+    return names
+
+
+def _max_role_rank(names: list) -> int:
+    return max([ROLE_RANK.get(n, 0) for n in (names or [])] or [0])
+
+
+def _highest_role(names: list) -> str:
+    """取等级最高的角色名；空列表回退 guest。"""
+    if not names:
+        return DEFAULT_HALO_ROLE
+    return max(names, key=lambda n: ROLE_RANK.get(n, 0))
+
+
+def sync_role(username: str, halo_role: str) -> tuple:
+    """按论坛角色同步本地角色，但**绝不降权**。返回 (是否成功, 错误信息, 是否跳过)。
+
+    背景：POST /users/{name}/permissions 是**替换**语义，会把用户全部角色换成
+    请求里的集合。若每次登录都无条件同步论坛角色，则论坛侧为 student（映射
+    guest）的账号会把本地手工授予的 super-role / post-author 冲掉——这正是
+    「设为管理员后一登录又变回访客」的根因。
+
+    规则：
+      - 目标角色等级 >= 现有最高角色 → 执行同步（正常升权 / 横向切换）；
+      - 目标角色等级 <  现有最高角色 → 跳过（保护既有更高权限不被登录覆盖）。
+    """
+    current = get_user_roles(username)
+    if _max_role_rank(current) > ROLE_RANK.get(halo_role, 0):
+        return True, "", True
+    ok, err = _grant_role(username, halo_role)
+    return ok, err, False
+
+
 def local_username_for(user_id: str) -> str:
     """forum user_id → 本地用户名（确定、幂等）。"""
     return LOCAL_USER_PREFIX + (user_id or "").strip()
@@ -173,10 +234,10 @@ def create_halo_user(
         ok, err = _sync_password(username, password)
         if not ok:
             return False, err, False
-        # 角色以论坛为准，尽力追加同步。
-        # 注意：Halo 的授权接口只支持追加（grant），论坛侧降权不会自动回收本地
-        # 高权角色，需在控制台手工调整——已在交付文档中标注为已知限制。
-        _grant_role(username, halo_role)
+        # 角色同步采取「不降权」策略：仅当论坛角色等级不低于本地现有角色时才改写，
+        # 避免论坛侧为 student（→guest）时把本地手工授予的管理员/作者角色冲掉
+        # （POST /users/{name}/permissions 是替换语义，非追加）。
+        sync_role(username, halo_role)
         return True, "", False
 
     create_body = {
@@ -291,6 +352,9 @@ def unified_login(
         return result
 
     result.user_created = created
+    # 回填「实际生效」角色：登录同步不降权，账号可能已持有比论坛映射更高的角色
+    # （例如本地手工授予的 super-role），此处以真实生效角色为准，避免误导。
+    result.effective_role = _highest_role(get_user_roles(username))
     result.ok = True
     return result
 
@@ -315,8 +379,8 @@ if __name__ == "__main__":
 
     print("confirmed=%s forum_uid=%s role=%s" % (
         r.confirmed, r.forum_user_id, r.forum_role))
-    print("halo_username=%s halo_role=%s user_created=%s" % (
-        r.halo_username, r.halo_role, r.user_created))
+    print("halo_username=%s halo_role=%s effective_role=%s user_created=%s" % (
+        r.halo_username, r.halo_role, r.effective_role, r.user_created))
     if r.ok:
         print("=> 登录链路就绪，可继续走 Halo 建会话")
         sys.exit(0)

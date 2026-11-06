@@ -131,6 +131,8 @@ class LoginHandler(BaseHTTPRequestHandler):
                 "ok": True,
                 "halo_username": r.halo_username,
                 "halo_role": r.halo_role,
+                # 实际生效角色（本地可能已有更高角色，登录同步不降权）
+                "effective_role": r.effective_role or r.halo_role,
                 "display_name": r.forum_display_name or r.forum_username,
                 "user_created": r.user_created,
             }

@@ -37,8 +37,30 @@ Halo 会话（/uc 个人中心；admin 角色可进 /console）
 授予方式：`POST /apis/api.console.halo.run/v1alpha1/users/{name}/permissions`，
 body `{"roles":["<role>"]}`。创建接口本身不认 `roles` 字段（默认 `guest`），必须单独授予。
 
-已知限制：Halo 的授权接口只支持追加（grant），**论坛侧降权不会自动回收本地高权角色**，
-需在控制台手工调整角色。升权（student → teacher）在下次登录时自动生效。
+### 授权语义：替换，不是追加（重要）
+
+该接口是**替换**语义——服务端把用户的全部角色整体换成请求里的集合，并非追加。
+（`UserServiceImpl` 日志：`Updated roles for user: existingRoles=[A], roles=[B]`，
+旧的 RoleBinding 会被 GC 删除；请求集合里带上已有角色名会返回 400「名称重复」。）
+
+因此每次统一登录都无条件同步论坛角色，会造成**降权**：论坛侧为 `student`（映射 `guest`）
+的账号，其本地手工授予的 `super-role` / `post-author` 会被登录冲掉，
+表现为「设为管理员后一登录又变回访客」。
+
+**修复（`sync_role` 不降权同步）**：登录同步时比较目标角色与本地现有角色的权限等级
+（`ROLE_RANK`：super-role 100 > post-author 50 > guest 10）：
+
+- 目标等级 **≥** 现有最高等级 → 执行同步（正常升权、横向切换）；
+- 目标等级 **<** 现有最高等级 → **跳过**，保护既有更高权限不被登录覆盖。
+
+由此形成两条明确边界：
+
+- **自动升级**：论坛升权（student → teacher）在下次登录自动生效；
+- **手工回收**：论坛降权**不会**自动回收本地高权角色，需在控制台手工调整
+  （这是刻意的取舍——宁可保留权限也不误降管理员）。
+
+BFF 响应与 CLI 输出附带 `effective_role`（登录后**实际生效**角色），
+与 `halo_role`（论坛角色映射值）可能不同，排障时以 `effective_role` 为准。
 
 ## 三、账号与凭据
 
