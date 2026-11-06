@@ -1,4 +1,0 @@
-mcp-server
-ai-page-builder
-ai-foundation
-app-store-integration

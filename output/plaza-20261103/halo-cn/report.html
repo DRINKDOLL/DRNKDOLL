@@ -222,7 +222,7 @@ logging:
       <thead><tr><th style="width:26%">事项</th><th>说明</th></tr></thead>
       <tbody>
         <tr><td>控制台前端</td><td>打包在 jar 内（<code>console/</code> 静态资源），外部无法逐字修改；实测 2.27.2 已在 <code>en-US</code> 下降级为中文，无需干预</td></tr>
-        <tr><td>品牌与技术专名</td><td><code>Halo</code>、<code>MCP</code>、<code>AI Foundation</code>、<code>Powered by Halo</code> 属品牌署名，按要求保留</td></tr>
+        <tr><td>品牌与技术专名</td><td><code>Halo</code>、<code>Powered by Halo</code> 属品牌署名，按要求保留</td></tr>
         <tr><td>主题升级</td><td>主题模板补丁会在主题升级时被覆盖；升级后重跑 <code>scripts/patch_theme.py</code> 即可</td></tr>
         <tr><td>Basic 认证</td><td>为脚本化调用 API 而开启，生产环境应关闭并改用会话鉴权</td></tr>
         <tr><td>数据留存</td><td>演示实例数据在 <code>workdir/</code>，<code>reset.sh</code> 可随时清空重建</td></tr>
