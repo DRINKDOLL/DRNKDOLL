@@ -98,6 +98,15 @@ env -u SERVER__PORT -u SERVER__HOST -u SERVER_PORT -u SERVER_ADDRESS \
 - `gateway.env` 的 `PLAZA_GW_INTERNAL_SIGN_SECRET` 部署脚本首次会**随机生成**；若要与网关侧一致须手工替换为约定共享值后 `systemctl restart gateway`。密钥来源看启动日志（env/file/demo）。
 - v5（2026-11-06 12:14）：升级 gateway（用户态路由+注入器）、对齐密钥、补 Nginx 用户态入口、修限流令牌桶。备份 `/opt/plaza/backup/gw-20261106121207/`。README-DEPLOY 有「v5 增量部署」+回滚命令。
 
+## 7.3 账号管理（用户/角色）
+
+- **账号与角色是运行时数据**（`workdir/db/halo-next.mv.db`，已 gitignore），git 无法复现；用可版本化脚本固化操作：`halo-cn/scripts/grant_admin.py <username>`（幂等：不存在则建号、存在则保留密码、追加 super-role、末校验）。可传 `--password` / `--roles a,b` / `--reset-password`。
+- 授权接口：`POST /apis/api.console.halo.run/v1alpha1/users/{name}/permissions`，body `{"roles":["super-role"]}`（**追加语义**，Halo 不支持降权，需控制台手工处理）。创建：`POST /apis/api.console.halo.run/v1alpha1/users`（body `name/displayName/email/password`，创建接口默认给 guest，须再 grant）。改密：`PUT .../users/{name}/password` body `{"password":...}`。
+- **删/禁用用户不在 `/apis/...` 下**（一律 404）：控制台 SPA 用的是 `DELETE /api/v1alpha1/users/{name}`；disable/enable 为 `/api/v1alpha1/users/{username}/disable|enable`。
+- 角色映射（`gateway/unified_login.py` ROLE_MAP）：admin→super-role；teacher/assistant→post-author；student/其他→guest。
+- 单用户读取返回 `{"user":{...},"roles":[...]}`；列表接口 `items[]` 直接是 User。
+- **已知遗留安全债**：`deploy/ssh/deploy_ed25519`、`workdir/keys/pat_id_rsa`、`deploy/{manage,login}.env` 曾进入提交 `5153595` 与远端，虽已 `git rm --cached` + gitignore，但**历史仍含明文**，须 filter-repo/BFG 清史并轮换 SSH 密钥/PAT。
+
 ## 8. 其他工程约定
 
 - 全程只用 Python 标准库，不引入文档外技术。
@@ -105,3 +114,5 @@ env -u SERVER__PORT -u SERVER__HOST -u SERVER_PORT -u SERVER_ADDRESS \
 - bash 里中文 `curl -d` 会乱码，改用 Python json 编码。
 - 后台服务一律用 Bash `run_in_background:true`。
 - 工作日志追加在 `.workbuddy/memory/YYYY-MM-DD.md`。
+- **推送 GitHub**：会话注入代理对 `github.com` 的 CONNECT 隧道**频繁 502**（`api.github.com` 较稳），单次成功率约 1/5 → 用循环 `for i in $(seq 1 8); do git push origin main && break; sleep 4; done`。仓库 `https://github.com/DRINKDOLL/DRNKDOLL` 分支 `main`，凭据已存 Windows 凭据管理器（DRINKDOLL + gho_ 令牌）。
+- **入库排除**（`.gitignore`）：`*.env`、`ssh/`、`workdir/keys/`、`gateway/configs/secrets.json`、`deploy/pkg3/`(134M jar)、`halo-lab/tools|jars|work`、插件 jar、`workdir/db|indices|attachments|archive`、演示工具 `.cache/.slidep`、`__pycache__/`、`halo-cn/output/`（文档流水线产物）、抓取临时 `deploy/{loc,rem}.html`。
