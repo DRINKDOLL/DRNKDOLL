@@ -36,6 +36,25 @@
     <strong th:text="#{form.messages.passwordReset}"></strong>
   </div>
 
+  <div
+    class="alert alert-error"
+    id="unified-login-error"
+    role="alert"
+    style="display: none"
+    th:if="${fragmentTemplateName} == 'login_local'"
+  >
+    <strong id="unified-login-error-text"></strong>
+  </div>
+
+  <p
+    id="unified-login-hint"
+    th:if="${fragmentTemplateName} == 'login_local'"
+    style="margin: 0 0 1.1em; color: #4b5563; font-size: var(--text-sm); line-height: 1.7; text-align: center"
+  >
+    请使用 <strong style="color: #0e1731; font-weight: 600">警院论坛（WeChat 五平台）账号</strong> 登录，
+    首次登录将自动开通本站账号并同步角色权限。
+  </p>
+
   <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
 
   <div th:if="${authProvider.spec.rememberMeSupport}" class="form-item-compact">
@@ -45,6 +64,18 @@
 
   <div class="form-item">
     <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+
+  <div
+    th:if="${fragmentTemplateName} == 'login_local'"
+    style="margin-top: 0.9em; text-align: center; font-size: var(--text-sm)"
+  >
+    <a
+      href="#"
+      id="unified-login-toggle"
+      style="color: #1f4f8b; text-decoration: underline; text-underline-offset: 0.2em"
+      >使用本地账号登录</a
+    >
   </div>
 </form>
 

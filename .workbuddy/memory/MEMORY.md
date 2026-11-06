@@ -1,105 +1,107 @@
-# 项目长期约定
+# 项目长期约定（精编版）
 
-## 运行网页的固定指令
+## 1. 启动 / 运行广场（用户说「运行/启动/打开广场」即执行）
 
-- 用户说「运行 / 启动 / 打开广场」等指令时，直接启动「警院成果展示广场」Halo 实例并打开首页预览。
-- 启动方式：**优先用 PowerShell `Start-Process` 独立启动，且【不要带 `-RedirectStandardOutput/-RedirectStandardError`】**（java 进程由 Windows 独立托管，不会被后台任务层回收；Halo 自己用 logback 写日志到 `run/halo.log`，不依赖 stdout 重定向）。这是唯一稳定可靠的方式，已实测验证。
-  - 曾踩过的两个坑（都导致「启动→过一会儿进程消失」）：
-    1. `run_in_background` 后台任务启动的 java 进程，在任务被判 failed（退出码 1/127）后会被任务层连带回收，进程在 Spring 初始化极早期（「No active profile set」或「Finished repository scanning」）就消失。
-    2. `Start-Process` 若带了 `-RedirectStandardOutput/-RedirectStandardError`，PowerShell 会话一结束重定向句柄断开，会让 java 在 R2DBC 初始化前静默退出。
-  - Start-Process 正确命令（PowerShell）：
-    1. 先 `Remove-Item Env:HTTP_PROXY/HTTPS_PROXY/http_proxy/https_proxy -ErrorAction SilentlyContinue`（否则复制环境时大小写键冲突报「已添加项 http_proxy/HTTP_PROXY」）。
-    2. 命令（**不带任何重定向参数**）：
-       ```
-       $java = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\tools\jdk-21.0.13.0.2+1\bin\java.exe"
-       $jar  = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-lab\jars\halo-2.27.2.jar"
-       $workdir = "C:\Users\LENOVO\Desktop\成果广场\output\plaza-20261103\halo-cn"
-       $args = @("-Xms256m","-Xmx512m","-Dfile.encoding=UTF-8","-Dsun.jnu.encoding=UTF-8","-Duser.language=zh","-Duser.country=CN","-Duser.timezone=Asia/Shanghai","-jar",$jar,"--spring.config.additional-location=file:./config/","--server.port=8092","--server.address=0.0.0.0")
-       Start-Process -FilePath $java -ArgumentList $args -WorkingDirectory $workdir -PassThru -WindowStyle Hidden
-       ```
-    3. 启动后 java 进程 PID 是启动器返回的 `$p.Id`；实际监听进程 PID 会不同（java.exe 会 fork），用 `tasklist | grep java` + `netstat -ano | grep :8092` 确认真实监听 PID。
-    4. 日志看 `halo-cn/run/halo.log`（logback 写入，比 `logs/halo.out` 更可靠，因为没重定向时 stdout 不落盘）。
-  - 注意：`config/application.yaml` 里已有端口/中文等配置，命令行 `--server.port/--server.address` 覆盖即可；不要依赖 `&` 后台（会随命令会话中断被连带杀掉）。
-- 启动命令（在 `output/plaza-20261103/halo-cn/` 下），**java.exe 与 jar 一律用绝对路径**（相对路径 `../halo-lab/...` 在后台任务里偶发「命令未找到」退出码 127，导致进程没起来）：
-  ```
-  cd "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-cn" && \
-  source ./env.sh && \
-  env -u SERVER__PORT -u SERVER__HOST -u SERVER_PORT -u SERVER_ADDRESS \
-    NO_PROXY=127.0.0.1,localhost no_proxy=127.0.0.1,localhost \
-    "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-lab/tools/jdk-21.0.13.0.2+1/bin/java.exe" \
-    -Xms256m -Xmx512m \
-    -jar "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-lab/jars/halo-2.27.2.jar" \
-    --spring.config.additional-location=file:./config/ \
-    --server.port=8092 --server.address=0.0.0.0 > logs/halo.out 2>&1
-  ```
-- 服务信息：首页 http://127.0.0.1:8092/ ；管理后台 http://127.0.0.1:8092/console；局域网 http://10.1.1.239:8092/。
-- 登录凭据（两个账号，每次「运行」都要一并列出）：
-  - 管理员：用户名 admin / 密码 Passw0rd!2026（可访问 /console 管理后台）
-  - 普通用户：用户名 student / 密码 Student!2026（角色 post-author「作者」，登录后跳转 /uc 个人中心，**不能访问管理后台**，适合日常登录）
-  - 用户要求：每次「运行」启动/打开网页后，务必把两个账号以「用户名：xxx / 密码：xxx」清晰易读的格式一并发出，并注明哪个是管理员、哪个是普通用户。
-- 启动后轮询首页直到 HTTP 200，再用 present_files 打开 http://127.0.0.1:8092/ 预览。
-- 端口被占先确认旧进程；H2 文件被锁时报 MVStoreException 时，先确保 8092 端口真正释放再启动。
-- 后台任务的退出码通知（127 / 1073807364 等）不一定是真失败：Java 进程可能已独立存活继续初始化。收到失败通知后，务必先 `curl` 实测首页 HTTP 状态 + `tasklist` 查 java 进程，再决定是否重启，不要仅凭退出码误判。
-- 若实测首页 000 且无 java 进程，说明实例确实没起来，需重新用后台任务启动。
+- 路径：`C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-cn`，端口 8092，首页 http://127.0.0.1:8092/ ，后台 /console。
+- 用 `run_in_background: true` 启动，**java.exe 与 jar 必须绝对路径**（相对路径在后台任务里会 127 退出）；不要重定向 stdout（让 logback 写 `run/halo.log`）：
 
-## 定制 Halo 界面的两条通道（已验证）
+```
+cd "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-cn" && source ./env.sh && \
+env -u SERVER__PORT -u SERVER__HOST -u SERVER_PORT -u SERVER_ADDRESS \
+  NO_PROXY=127.0.0.1,localhost no_proxy=127.0.0.1,localhost \
+  "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-lab/tools/jdk-21.0.13.0.2+1/bin/java.exe" \
+  -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Duser.language=zh -Duser.country=CN -Duser.timezone=Asia/Shanghai \
+  -jar "C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-lab/jars/halo-2.27.2.jar" \
+  --spring.config.additional-location=file:./config/ --server.port=8092 --server.address=0.0.0.0
+```
 
-- **主题模板**：`workdir/themes/theme-earth/templates/**`，改完必须**重启实例**（Thymeleaf 生产模式缓存模板）。
-- **核心静态资源（如登录页）**：`workdir/static/**` 会**覆盖 jar 内 `BOOT-INF/classes/static/**`**，改完**无需重启**即刻生效（`/images/`、`/styles/` 均适用）。
-  - 已用此通道实现登录页改造：`static/images/wordmark.svg`（站名标题）、`static/images/login-background.jpeg`（地球背景）、`static/styles/main.css`（复制 jar 原版后追加覆盖样式）。
-  - ⚠️ 静态资源带一年期 `max-age` 缓存，且 URL 固定为 `?v=2.27.2`，**用户浏览器一旦缓存旧副本，服务端怎么改都看不到**（需 `Ctrl+Shift+R`）。因此「改登录页视觉」优先走下面的模板通道，不要依赖静态资源替换。
-- **核心 Thymeleaf 模板（登录/注册/找回密码/错误页）**：`workdir/templates/` 默认不生效，**必须**在 `config/application.yaml` 里配置 `spring.thymeleaf.prefix: file:./workdir/templates/`（可加 `cache: false`），才能覆盖 jar 内 `BOOT-INF/classes/templates/`。
-  - 模板来源：`jar xf halo-2.27.2.jar BOOT-INF/classes/templates` 全量提取（约 106 个文件，含 `*.properties` 语言包，缺了会丢中文文案）。
-  - 登录页站名在 `gateway_fragments/common.html` 的 `haloLogo` fragment；背景在 `gateway_fragments/layout.html` 的 `<body class="gateway-page">`。改成内联样式最稳——HTML 响应是 `no-cache`，不受静态资源缓存影响。
-  - 若曾内联覆盖过 `<style>`（如 `.halo-logo img{width:6em}`），同名选择器特异性相同时位置靠后的胜出，需抬高特异性（`body .xxx`）或用 `!important`。
-  - `bootstrap.sh` 会校验 jar 的 sha256（`start.sh` 不校验）。只要不重跑 bootstrap，改 jar 是可用的最后手段（改前必须 `cp` 备份）。
-- theme-earth 是预编译主题，Tailwind 按需生成的类（`text-4xl`/`text-6xl`/`font-bold`/`md:grid-cols-3`/`underline`/`decoration-*`/`underline-offset-2`/`transition-colors` 等）**不在 CSS 里**，改类名不生效；需要用内联 `style`（如 `clamp()`、`text-decoration`）或改用已编译的类（如 `lg:grid-cols-3`、`cursor-pointer`、`hover:text-gray-600`）。
+- 排障：`run/halo.log` 只到「Finished Spring Data repository scanning」而无「Starting R2DBC migration」= 进程在连 H2 前就死了（`Start-Process -WindowStyle Hidden` 必现，别用）。子进程 PID ≠ 任务 PID，用 `tasklist | grep java` + `netstat -ano | grep :8092` 确认真实监听。后台任务退出码 127/1073807364 不代表真失败，先 `curl` 首页 + 查进程再判断。
+- **沙箱会回收会话内启动的后台进程**，稳定常驻靠 Windows 计划任务「警院成果广场自启动」（AtLogOn，执行 `halo-cn/autostart_task.bat`，该脚本同时拉起 Halo 8092 与登录 BFF 8095）。手动验证 `Start-ScheduledTask -TaskName "警院成果广场自启动"`。
+- 自启动脚本要点：绝对路径写死 java/jar/workdir；**bat 必须 GBK + CRLF**（`iconv -f UTF-8 -t GBK 源 | sed 's/$/\r/' > 目标.bat`，不要用 Write 工具写 bat）；注释全用 ASCII；清代理并设 `NO_PROXY=127.0.0.1,localhost,::1`；开头用 `netstat|findstr :8092|findstr LISTENING` 防重复启动。三处需同步：Startup bat、`autostart_task.bat`、计划任务动作。
+- 登录凭据（每次「运行」都要一并清晰列出）：
+  - 管理员 admin / Passw0rd!2026（可进 /console）
+  - 普通用户 student / Student!2026（post-author，跳 /uc，不能进后台）
+- 启动后轮询首页到 HTTP 200，再 `present_files` 打开。端口占用/H2 被锁（MVStoreException）先确保 8092 释放。
 
-## 文章正文为空 = 快照缺渲染产物（不是主题问题）
+## 2. 定制 Halo 界面的三条通道
 
-- 现象：详情页只有标题、正文区空白，但侧边目录/摘要正常。查 `GET /apis/api.console.halo.run/v1alpha1/posts/{name}/head-content`，若 `raw` 有内容而 `content` 为 0 字节，即此症。
-- 原因：Halo 控制台保存文章时由**前端**把 markdown 编译成 HTML 再提交；用接口只写 raw 不会自动渲染。
-- 修复（Basic auth admin/Passw0rd!2026 即可）：`PUT /apis/api.console.halo.run/v1alpha1/posts/{name}/content`，body `{raw, content, rawType:"markdown"}`，再 `PUT .../{name}/publish`（**必须 PUT，POST 404**）。
-- 现成脚本：`halo-cn/scripts/render_post_content.py`（含简易 markdown→HTML；`--dry-run` / `--post NAME` / `--force` 从 baseSnapshot 恢复原稿）。
-- 该 PostEndpoint 是 RouterFunction，可用路由仅：`posts`、`posts/{name}`、`posts/{name}/content`、`/release-content`、`/head-content`、`/snapshot`、`/revert-content`、`/publish`、`/unpublish`、`/recycle`；`/draft`、`posts/{name}`(GET) 都是 404。
+- **主题模板** `workdir/themes/theme-earth/templates/**`：改完必须重启（Thymeleaf 缓存）。
+- **核心模板**（登录/注册/错误页）：需在 `config/application.yaml` 配 `spring.thymeleaf.prefix: file:./workdir/templates/` 才生效；模板来自 `jar xf ... BOOT-INF/classes/templates` 全量提取（含 `*.properties`，缺了丢中文）。登录页站名在 `gateway_fragments/common.html` 的 `haloLogo`，背景在 `gateway_fragments/layout.html` 的 `<body class="gateway-page">`。改内联样式最稳（HTML 响应 no-cache）。
+- **核心静态资源** `workdir/static/**` 覆盖 jar，改完无需重启；但有 1 年 max-age 且 URL 固定 `?v=2.27.2`，用户浏览器缓存后看不到改动（需 Ctrl+Shift+R）→ 视觉改动优先走模板通道，别依赖静态替换。
+- theme-earth 是预编译主题，`text-4xl`/`font-bold`/`md:grid-cols-3` 等类**不在 CSS 里**，改类名无效；用内联 style 或已编译类（`lg:grid-cols-3`、`cursor-pointer`）。
+- `bootstrap.sh` 校验 jar sha256（`start.sh` 不校验），不重跑 bootstrap 时改 jar 是最后手段（先 `cp` 备份）。
 
-## 成果详情爬虫（crawl_achievements.py）
+## 3. 文章正文为空 = 快照缺渲染产物
 
-- 位置：`halo-cn/scripts/crawl_achievements.py` + 配置 `scripts/achievement_sources.json`（slug → 来源 url / content_selector / summary / max_chars / max_images）。
-- 纯标准库实现（urllib + html.parser 迷你 DOM），无 pip 依赖；`--dry-run` 只打印、`--slug X` 单项目、`--no-images`、`--prune-images`。
-- 抓取流程：选取正文容器（selector 支持 `tag.cls` / `#id` / `.cls`，留空或正文过少时用 `auto_content` 兜底：一次 DFS 取「文本量≥最大值90% 且层级最深」的容器）→ 白名单抽块（h2-h4/p/ul/ol/table/figure/img/blockquote）→ `SECTION_SKIP` 丢弃安装/依赖/FAQ/许可类章节 → `polish()` 清洗 → 图片下载改写 → 写库发布。
-- 可访问性事实：维基/百度百科抓不到；**阿里云开发者社区正文前端渲染，抓不到**；腾讯云开发者社区服务端渲染，最稳。
-- 坑：`SKIP_CLASS_HINTS` 必须用精确 token（曾用 `mark` 误杀 `rno-markdown` 整篇正文）；`pre` 代码块会被主题 blur，直接跳过；图片 URL 需 `quote()` 处理空格括号。
-- 图片落地：`workdir/static/images/achievements/<slug>/`，站内路径 `/images/achievements/...`，无需重启。
-- 正文结构固定为：作品说明 / 技术方案与实现（中文导语 + 抓取摘录 + 图）/ 项目信息 / 体验方式 / 参考资料。
-- 暗色：主题 `markdown-body` 没有暗色配色，必须在 main CSS 追加 `.dark #content ...` 覆盖，否则正文在暗色下不可读。
+- 现象：详情页只有标题、正文空白。查 `GET /apis/api.console.halo.run/v1alpha1/posts/{name}/head-content`，`raw` 有内容而 `content` 为 0 字节即此症。原因：Halo 由**前端**把 markdown 编译成 HTML 再提交。
+- 修复：`PUT .../posts/{name}/content`（body `{raw,content,rawType:"markdown"}`）→ `PUT .../{name}/publish`（必须 PUT，POST 404）。现成脚本 `halo-cn/scripts/render_post_content.py`（`--dry-run/--post NAME/--force`）。
+- PostEndpoint 是 RouterFunction，只有：`posts`、`posts/{name}`、`posts/{name}/content`、`/release-content`、`/head-content`、`/snapshot`、`/revert-content`、`/publish`、`/unpublish`、`/recycle`；`/draft` 与 GET `posts/{name}` 都 404。
 
-## 卡片渲染有两条路径（改卡片必须两边都改）
+## 4. 成果详情爬虫
 
-- 服务端：`modules/post-card.html`（+ `modules/featured-post-card.html` 置顶卡），被 index/category/author/tag/categories/tags 复用，改一处即全站生效。**注意 `archives.html`（文章页）有自己的列表结构，不复用 post-card，需要单独改。**
-- 客户端：`index.html` 与 `category.html` **各有一份 `renderCard`**（分类切换时替换 `#post-list`）。只改模板不改 JS，一切换分类新增元素就消失；只改 JS 不改模板，首屏就看不到。
-- 卡片简介已做成详情页链接（`<a>` 包住 `th:text` 的简介）；标题下方另有胶囊入口「查看项目详情 ›」（class `post-detail-link`），hover 样式追加在 `templates/assets/main-BaWd_1hx.css` 末尾（需 `!important` 才能覆盖内联样式）。
+- `scripts/crawl_achievements.py` + `scripts/achievement_sources.json`（slug→url/selector/summary/max_chars/max_images），纯标准库（urllib + html.parser），`--dry-run/--slug/--no-images/--prune-images`。
+- 流程：取正文容器（`tag.cls`/`#id`/`.cls`，为空或过少用 `auto_content` 兜底）→ 白名单抽块（h2-h4/p/ul/ol/table/figure/img/blockquote）→ `SECTION_SKIP` 丢安装/依赖/FAQ/许可类 → `polish()` → 图片下载改写 → 写库发布。
+- 可访问性：维基/百度百科抓不到；阿里云开发者社区前端渲染抓不到；腾讯云开发者社区最稳。
+- 坑：`SKIP_CLASS_HINTS` 用精确 token（曾用 `mark` 误杀 `rno-markdown`）；`pre` 被主题 blur 直接跳过；图片 URL 要 `quote()`。
+- 图片落 `workdir/static/images/achievements/<slug>/`，站内 `/images/achievements/...`，无需重启。正文固定结构：作品说明/技术方案与实现/项目信息/体验方式/参考资料。暗色下需在 main CSS 追加 `.dark #content ...` 覆盖。
 
-## 详情页「返回」入口的路由约定
+## 5. 卡片 / 详情页（改卡片必须两边都改）
 
-- `post.html` 顶部与底部各一个 `a[data-post-back]`（文案节点 `[data-post-back-label]`），`</body>` 前内联脚本统一处理：同源 referrer → 目标为 referrer 地址、文案「返回上一页」，点击先 `history.back()`（还原来源页状态），400ms 未离开再 `location.assign` 兜底；无 referrer（新标签/外链）→ 回 `/`、文案「返回首页」。
-- 首页分类筛选是客户端状态，已把状态写进 `#cat=<分类名>` hash（`categoryFilter.init()` 读、筛选后 `history.replaceState` 写），否则返回时筛选会丢。
-- 公开成果详情接口（免鉴权）：`GET /apis/api.content.halo.run/v1alpha1/posts/{name}`，返回 Post 及 `content:{raw, content}`（content 即渲染后 HTML）；列表 `.../posts`、分类 `.../categories/{name}/posts`。
+- 服务端 `modules/post-card.html`（+`featured-post-card.html`）被 index/category/author/tag 复用；**`archives.html` 有独立列表结构，需单独改**。
+- 客户端 `index.html` 与 `category.html` **各有一份 `renderCard`**：只改模板则切分类后新元素消失，只改 JS 则首屏没有。
+- 卡片简介已是详情页链接（`<a>` 包 `th:text`）；标题下另有胶囊「查看项目详情 ›」（`.post-detail-link`），hover 样式在 `templates/assets/main-BaWd_1hx.css` 末尾，需 `!important`。
+- 返回入口：`post.html` 顶部/底部各一 `a[data-post-back]`（文案 `[data-post-back-label]`），`</body>` 前脚本处理：同源 referrer → 目标为 referrer、文案「返回上一页」，点击先 `history.back()`，400ms 未离开再 `location.assign`；无 referrer → `/`、「返回首页」。首页分类筛选状态写在 `#cat=<分类名>` hash，否则返回丢状态。
+- 公开接口（免鉴权）：`GET /apis/api.content.halo.run/v1alpha1/posts/{name}` 返回 `content:{raw,content}`；列表 `.../posts`、`.../categories/{name}/posts`。
 
-## 控制台 / 个人中心（Vue SPA）的定制方式
+## 6. 控制台 / 个人中心（SPA）定制
 
-- 资源映射（`WebFluxConfig` 里硬编码，**workdir 无法覆盖**）：
-  - `/console` → jar 内 `BOOT-INF/classes/ui/console.html`（响应头 `no-store`，改完普通刷新即生效）
-  - `/uc` → jar 内 `BOOT-INF/classes/ui/uc.html`
-  - `/ui-assets/**` → `classpath:/ui/ui-assets/`（React/Vue 打包产物，带 `.gz` 同名副本）
-  - 只有 `/**` 才走 `workdir/static/`，且优先级低于上面三条。
-- 控制台左上角「Halo」标志是 **内联 SVG**（`.sidebar__logo`，viewBox `0 0 2144 877`），没有独立图片文件，只存在于 JS 里，因此**改不了静态资源，只能改 jar 内的 `console.html`**。
-- 已验证的改法（纯 CSS，零 JS，功能不受影响）：在 `console.html` 唯一那个 `<style>` 块里追加
+- 映射硬编码在 `WebFluxConfig`，workdir 无法覆盖：`/console`→jar `BOOT-INF/classes/ui/console.html`（no-store，刷新即生效）、`/uc`→`uc.html`、`/ui-assets/**`→classpath；只有 `/**` 走 workdir/static 且优先级更低。
+- 侧边栏「Halo」标志是**内联 SVG**（`.sidebar__logo`），只能改 jar 内 console.html。已在唯一 `<style>` 块追加：
   ```css
   .sidebar__logo{display:none!important}
   .sidebar__logo-container a::after{content:"警院成果展示广场";display:block;font-size:1.0625rem;font-weight:700;color:#0e1731;letter-spacing:.02em;white-space:nowrap;line-height:2rem}
   ```
-  `line-height:2rem` 用来保持容器高度仍是 72px；原 `<a href="/" title="访问首页">` 不动，点击行为不变。侧边栏是固定白底 `#fff`、无暗色模式，故用深蓝文字。
-- 更新 jar 的正确姿势：先 `Stop-Process` 停实例（Windows 下 jar 被占用无法写）→ `jar uf <jar> BOOT-INF/classes/ui/console.html BOOT-INF/classes/ui/console.html.gz`（**同时更新 `.gz`**，用 `gzip.compress(data, 9, mtime=0)` 生成）→ 启动。`jar uf` 是原地更新，条目总数与 manifest 不变，比重建 zip 安全。
-- 备份文件：`halo-lab/jars/halo-2.27.2.jar.bak-20261104`（回滚即 `cp` 回去）。
-- 控制台 SPA 有持续轮询，Playwright 用 `waitUntil:'networkidle'` 会超时，改用 `domcontentloaded` + 固定等待。
+- 改 jar 姿势：停实例 → `jar uf <jar> BOOT-INF/classes/ui/console.html <同目录 .gz>`（.gz 用 `gzip.compress(data,9,mtime=0)`）→ 启动。备份 `halo-lab/jars/halo-2.27.2.jar.bak-20261104`。
+- 控制台 SPA 持续轮询，Playwright 用 `networkidle` 会超时，改 `domcontentloaded` + 固定等待。
+
+## 7. 统一身份登录（论坛账号 → 广场会话）
+
+- 组成：`gateway/unified_login.py`（链路）+ `gateway/login_server.py`（BFF，端口 **8095**，纯标准库）+ 登录页前端。
+- 链路：登录页拦提交 → BFF `POST /api/unified-login` 做论坛确认 → `forum-<user_id>` 映射本地用户（幂等）→ 前端换 username、密码不变 → 原生 `POST /login` 由 Spring Security 建会话。BFF **不代建会话**。
+- 每次登录：已存在用户同步密码（`PUT /apis/api.console.halo.run/v1alpha1/users/{name}/password`，body `{password}`，admin 令牌即可）+ 尽力 grant 角色（Halo 只支持追加，**降权需控制台手工处理**，已知限制）。
+- 角色映射：admin→super-role，teacher/assistant→post-author，student/其他→guest。
+- 启动 BFF：`python -m gateway.login_server`（系统 python 绝对路径 `C:/Users/LENOVO/AppData/Local/Programs/Python/Python313-32/python.exe`），已并入 `autostart_task.bat`（Halo 8092 + BFF 8095）。
+- **前端坑**：submit 事件处理里调 `form.requestSubmit()` 会被浏览器静默忽略（点了没反应、无报错），必须用 `form.submit()`。
+- BFF Origin 校验：白名单命中 **或** 与请求 `Host` 同主机不同端口（否则局域网 IP 访问一律 403）。
+- 登录卡片是白底，提示文字用深色（`#4b5563`/`#0e1731`），浅色会看不见；兜底入口「使用本地账号登录」用于 admin/student 本地账号与 BFF 未启动降级。
+- 验收脚本 `scripts/verify_unified_login.js`（Playwright，10 项断言）。说明文档 `gateway/README-unified-login.md`。
+
+## 7.1 网关接入（服务态 8094 / 用户态入站）
+
+- **入站**两种鉴权模型，都在 `gateway/server.py`（8094）：
+  - 服务态 `/api/v1/internal/**`：消费方 AppKey + L2 签名（`X-App-Key`+HMAC-SHA256），只读、白名单默认拒绝、限流。
+  - 用户态 `/api/v1/user/**`：由**网关**注入 `X-User-Id`/`X-User-Role`/`X-Token-Exp`/`X-Internal-Sign` 等；广场校验内部签名（缺失/伪造 → **403/40303**）、令牌过期（**401/40103**）、水平越权（非作者非管理员 **403/70002**，管理员豁免）。接线 `identity.parse_identity`+`enforce_owner`。
+- **功能联动**（注入方→校验方闭环）：注入方 `gateway/identity_injector.py`（`build_identity_headers`/`call_user_api`/CLI），校验方 `identity.py`+`/api/v1/user/**`。内部签名密钥**统一解析** `config.resolve_internal_sign_secret()`：env `PLAZA_GW_INTERNAL_SIGN_SECRET` > `configs/secrets.json` 的 `internal_sign.secret`（已 gitignore）> demo 兜底；`internal_sign_secret_source()` 返回来源，启动日志会打印。**注入方/校验方/验收脚本三处必须同一解析，否则联动整体 403。** CLI 有 MSYS 路径改写防御（Git Bash 会把 `/api/...` 改成 `C:/Program Files/Git/api/...`）。
+- **出站**：`gateway/account_verify.py` 走真实外网 `POST http://8.138.246.181/answer/api/v1/account/verify`（L2 签名），正向 200/uid=1、反向 401/40104 防枚举。
+- **验收**：`scripts/verify_gateway.py` **35 条**（服务态 17 + 用户态入站 7 + **功能联动 4** + 工具 2 + IF-07 降级 1 + 出站桩 4/实际 2）全绿，可复跑。文档 `gateway/README-gateway-status.md`（含「功能联动」章节、90 天轮换、已知限制）。
+- 三要素结论：入站严格验签（伪造 403）/ 出站 L2+confirmed / 上游桩→真实 BFF，均已完成实测。
+- 密钥轮换：`svc-plaza` 90 天（S1 核心），其余季度自查；**历史密钥经截图分发过，首次轮换须一并作废**。
+- **限流**：`server.py` 的 `RateLimiter` 是**令牌桶**（容量=qps=100，允许突发，长期均值限 100 QPS）。勿改回「固定最小间隔」——那会把同页并发请求误判 429。
+
+## 7.2 公网服务器部署（8.138.34.151）
+
+- 服务器：阿里云轻量应用服务器（SWAS，**不是 ECS**）；Alibaba Cloud Linux 3 / x86_64 / 2C1.8G；Python 3.11、JDK 21。四服务 systemd 单元全 `enabled` 常驻：`plaza`(8092)、`manage`(8093)、`gateway`(8094)、`nginx`(80)。均开自启。
+- 目录：`/opt/plaza/{halo.jar,config,workdir,gateway,manage,scripts,backup,logs}`；配置 `config/{application.yaml,gateway.env,manage.env}`（600）、`configs/secrets.json`。
+- 部署通道：`deploy/dpl.py`（paramiko）+ `deploy/deploy_now.sh`；凭据从环境变量读：`DPL_HOST=8.138.34.151 DPL_USER=root DPL_KEY=deploy/ssh/deploy_ed25519`（服务器已禁密码登录，**密钥登录仍有效**）。paramiko 只在 WorkBuddy 自带 Python 里：`C:/Users/LENOVO/.workbuddy/binaries/python/versions/3.13.12/python.exe`。
+- **Git Bash 必设 `MSYS2_ARG_CONV_EXCL="*"`**：否则 `dpl.py put <local> /opt/...` 的远端绝对路径被改写成 `C:/Program Files/Git/opt/...`，SFTP 报 `FileNotFoundError`。
+- Nginx `deploy/plaza.conf`：`/api/manage/`→8093（`auth_request /_manage_authz` 门禁）、`= /api/unified-login`→8095、`/api/v1/internal/`→8094、**`/api/v1/user/`→8094**、`/`→8092。改完 `nginx -t && systemctl reload nginx`。
+- `gateway.env` 的 `PLAZA_GW_INTERNAL_SIGN_SECRET` 部署脚本首次会**随机生成**；若要与网关侧一致须手工替换为约定共享值后 `systemctl restart gateway`。密钥来源看启动日志（env/file/demo）。
+- v5（2026-11-06 12:14）：升级 gateway（用户态路由+注入器）、对齐密钥、补 Nginx 用户态入口、修限流令牌桶。备份 `/opt/plaza/backup/gw-20261106121207/`。README-DEPLOY 有「v5 增量部署」+回滚命令。
+
+## 8. 其他工程约定
+
+- 全程只用 Python 标准库，不引入文档外技术。
+- Python：`base64.b64encode(b'...')` 已是 bytes；子进程 `python -c` 需 `export PYTHONPATH=<halo-cn>` 才能 import gateway。
+- bash 里中文 `curl -d` 会乱码，改用 Python json 编码。
+- 后台服务一律用 Bash `run_in_background:true`。
+- 工作日志追加在 `.workbuddy/memory/YYYY-MM-DD.md`。

@@ -12,20 +12,48 @@ HOST = os.environ.get("DPL_HOST", "")
 PORT = int(os.environ.get("DPL_PORT", "22"))
 USER = os.environ.get("DPL_USER", "")
 PWD = os.environ.get("DPL_PASS", "")
+KEY = os.environ.get("DPL_KEY", "")
+
+
+def _pkey():
+    """按 DPL_KEY 指定的私钥文件构造 pkey 对象。"""
+    if not KEY or not os.path.exists(KEY):
+        return None
+    for cls in (paramiko.Ed25519Key, paramiko.RSAKey, paramiko.ECDSAKey):
+        try:
+            return cls.from_private_key_file(KEY)
+        except Exception:  # noqa: BLE001
+            continue
+    return None
 
 
 def connect(retries=3):
     last = None
+    pkey = _pkey()
     for i in range(retries):
         try:
             c = paramiko.SSHClient()
             c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            c.connect(
-                HOST, port=PORT, username=USER, password=PWD,
-                timeout=20, banner_timeout=30, auth_timeout=30,
-                look_for_keys=False, allow_agent=False,
-            )
+            if pkey is not None:
+                # 优先密钥登录（服务器已禁用密码认证时唯一可行方式）
+                c.connect(
+                    HOST, port=PORT, username=USER, pkey=pkey,
+                    timeout=20, banner_timeout=30, auth_timeout=30,
+                    look_for_keys=False, allow_agent=False,
+                )
+            else:
+                c.connect(
+                    HOST, port=PORT, username=USER, password=PWD,
+                    timeout=20, banner_timeout=30, auth_timeout=30,
+                    look_for_keys=False, allow_agent=False,
+                )
             return c
+        except paramiko.BadAuthenticationType as e:  # noqa: PERF203
+            last = e
+            # 密码方式被服务端拒绝时，若还有备用凭据则不再重试
+            if pkey is not None:
+                break
+            time.sleep(1)
         except Exception as e:  # noqa: BLE001
             last = e
             time.sleep(2)

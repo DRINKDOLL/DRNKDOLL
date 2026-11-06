@@ -1,0 +1,7 @@
+# 密钥与敏感配置（禁止提交）
+gateway/configs/secrets.json
+
+# 运行时产物
+logs/
+run/
+.tmp/

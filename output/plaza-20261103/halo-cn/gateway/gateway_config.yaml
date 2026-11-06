@@ -1,0 +1,40 @@
+# =============================================================
+# 成果展示广场「统一身份与网关接入」配置清单
+# 依据：《成果展示广场统一身份与网关接入说明文档》V1.1 第 5 章
+# 说明：auth.* 由网关/总平台统一下发，广场侧仅确认 plaza.* 与本平台配置，
+#       避免与总平台全局配置冲突。
+# =============================================================
+
+# ---- auth.*（网关/总平台下发，广场侧只读，勿在此改动）----
+auth.token.ttl: 7200            # access_token 有效期（秒）
+auth.code.ttl: 300              # 授权码有效期（秒）
+auth.state.ttl: 600             # state 有效期（秒）
+auth.introspect.timeout: 800    # 自省超时（毫秒），广场服务不直连，仅网关
+auth.sign.skew: 300             # L2 时间窗（秒）
+auth.sign.nonce.ttl: 600        # nonce 去重窗口（秒）
+auth.rate.user.qps: 20          # 单令牌限流
+auth.rate.app.qps: 200          # 单 AppKey 限流
+
+# ---- plaza.*（广场侧确认）----
+plaza.if08.rate: 100            # IF-08 接口限流（QPS）
+plaza.media.sign.ttl: 1800      # 媒体签名 URL 有效期（秒，30 分钟）
+
+# ---- 账号确认接口（POST /answer/api/v1/account/verify）----
+# 说明：AppSecret 一律不落此文件，必须经环境变量注入，见下方注释。
+plaza.account.verify.base: http://8.138.246.181   # 网关地址（可被 JY_GATEWAY_BASE 覆盖）
+plaza.account.verify.app_key: jy-plaza-svc       # 广场服务身份（可被 PLAZA_APP_KEY 覆盖）
+plaza.account.verify.timeout: 15                 # 客户端超时（秒），网关 S 级 3s，留足余量
+
+# ---- 用户态功能联动（X-Internal-Sign）----
+# 网关（注入方）与广场业务服务（校验方）共享的内部签名密钥。
+# 解析优先级：环境变量 > configs/secrets.json 的 internal_sign.secret > 演示兜底。
+# 密钥一律不落本文件；本地开发可写入 secrets.json（已 gitignore），生产用环境变量。
+#   PLAZA_GW_INTERNAL_SIGN_SECRET   内部签名共享密钥（必填，生产）
+plaza.internal.sign.fields: "X-User-Id,X-User-Role,X-Client-Id,X-Token-Exp,X-Request-Id,X-Auth-Mode"
+
+# 环境变量（必须注入，禁止硬编码）：
+#   PLAZA_APP_SECRET              广场 AppSecret（必填，缺失即报错拒绝调用）
+#   PLAZA_APP_KEY                 广场 AppKey（可选，默认 jy-plaza-svc）
+#   JY_GATEWAY_BASE               网关地址（可选，默认 http://8.138.246.181）
+#   PLAZA_GW_INTERNAL_SIGN_SECRET 内部签名共享密钥（用户态联动校验用，生产必填）
+

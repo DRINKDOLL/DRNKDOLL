@@ -1,0 +1,20 @@
+[Unit]
+Description=Jingyuan Plaza - Unified Login BFF (forum account verify, localhost:8095)
+Documentation=file:/opt/plaza/README-DEPLOY.md
+After=network.target plaza.service
+Wants=plaza.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/plaza
+EnvironmentFile=/opt/plaza/config/login.env
+ExecStart=/usr/bin/python3.11 -m gateway.login_server
+Restart=always
+RestartSec=3
+TimeoutStopSec=10
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -4,26 +4,193 @@
 </th:block>
 
 <th:block th:fragment="basicScriptResources">
-  <th:block th:if="${not #strings.isEmpty(publicKey)} and ${fragmentTemplateName} == 'login_local'">
+  <th:block th:if="${fragmentTemplateName} == 'login_local'">
     <script src="/webjars/jsencrypt/3.5.4/bin/jsencrypt.min.js" defer></script>
     <script th:inline="javascript" type="text/javascript">
-      const publicKey = /*[[${publicKey}]]*/ "";
+      // 登录页公钥（Halo 由服务端注入，用于 RSA 加密密码后提交）。
+      window.PLAZA_LOGIN_PUBLIC_KEY = /*[[${publicKey}]]*/ "";
 
-      // Encrypt function
-      function encryptPassword(password) {
-        const encrypt = new JSEncrypt();
-        encrypt.setPublicKey(publicKey);
-        return encrypt.encrypt(password);
-      }
+      // 统一身份登录前端编排：
+      //   提交 → 调 BFF 做论坛账号确认 + Halo 本地用户映射 → 换用映射用户名
+      //   → 用原密码（RSA 加密）提交 Halo 标准表单，由 Spring Security 建会话。
+      // 兜底：「使用本地账号登录」可切回原生账号密码登录（admin/student 等本地账号）。
+      (function () {
+        "use strict";
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const loginForm = document.getElementById("login-form");
-        loginForm.addEventListener("submit", function (event) {
-          const plainPasswordInput = document.getElementById("plainPassword");
-          const passwordInput = document.getElementById("password");
-          passwordInput.value = encryptPassword(plainPasswordInput.value);
+        var BFF_PORT = 8095;
+        var MODE_UNIFIED = "unified";
+        var MODE_LOCAL = "local";
+
+        function byId(id) {
+          return document.getElementById(id);
+        }
+
+        function bffUrl() {
+          // 线上经 Nginx 同源反代 /api/unified-login（只对外开 80/443），
+          // 本地开发实例（8092 等非标准端口）直连 BFF 的 8095。
+          var port = location.port;
+          if (port === "" || port === "80" || port === "443") {
+            return location.origin + "/api/unified-login";
+          }
+          return location.protocol + "//" + location.hostname + ":" + BFF_PORT + "/api/unified-login";
+        }
+
+        function encryptPassword(password) {
+          var publicKey = window.PLAZA_LOGIN_PUBLIC_KEY || "";
+          if (!publicKey || typeof JSEncrypt === "undefined") {
+            return password;
+          }
+          var encrypt = new JSEncrypt();
+          encrypt.setPublicKey(publicKey);
+          return encrypt.encrypt(password);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var form = byId("login-form");
+          if (!form) {
+            return;
+          }
+          var usernameInput = byId("username");
+          var plainPasswordInput = byId("plainPassword");
+          var passwordInput = byId("password");
+          if (!usernameInput || !plainPasswordInput || !passwordInput) {
+            // 非账号密码登录方式（如邮箱验证码），保持原生行为。
+            return;
+          }
+
+          var mode = MODE_UNIFIED;
+          var bypass = false;
+
+          var errorBox = byId("unified-login-error");
+          var errorText = byId("unified-login-error-text");
+          var hint = byId("unified-login-hint");
+          var toggle = byId("unified-login-toggle");
+          var submitBtn = form.querySelector('button[type="submit"]');
+          var submitLabel = submitBtn ? submitBtn.textContent : "登录";
+
+          function clearError() {
+            if (errorBox) {
+              errorBox.style.display = "none";
+            }
+            if (errorText) {
+              errorText.textContent = "";
+            }
+          }
+
+          function showError(message) {
+            if (errorBox && errorText) {
+              errorText.textContent = message;
+              errorBox.style.display = "";
+            }
+          }
+
+          function setBusy(busy, label) {
+            if (!submitBtn) {
+              return;
+            }
+            submitBtn.disabled = !!busy;
+            submitBtn.textContent = busy ? (label || "正在校验统一身份…") : submitLabel;
+          }
+
+          function applyMode(next) {
+            mode = next;
+            var unified = mode === MODE_UNIFIED;
+            if (hint) {
+              hint.style.display = unified ? "" : "none";
+            }
+            if (toggle) {
+              toggle.textContent = unified ? "使用本地账号登录" : "改用统一身份登录";
+            }
+            clearError();
+            setBusy(false);
+          }
+
+          if (toggle) {
+            toggle.addEventListener("click", function (event) {
+              event.preventDefault();
+              applyMode(mode === MODE_UNIFIED ? MODE_LOCAL : MODE_UNIFIED);
+            });
+          }
+
+          function submitNative() {
+            passwordInput.value = encryptPassword(plainPasswordInput.value || "");
+            bypass = true;
+            setBusy(true, "正在登录…");
+            // 注意：不能在 submit 事件处理中调用 form.requestSubmit()——浏览器会
+            // 认为表单已在提交中而忽略，导致既不报错也不发请求。这里直接走原生提交
+            // （已自行完成非空校验，且表单字段已就绪）。
+            form.submit();
+          }
+
+          form.addEventListener("submit", function (event) {
+            if (bypass) {
+              // 第二阶段：已完成账号映射，放行原生提交。
+              return;
+            }
+            event.preventDefault();
+            clearError();
+
+            var loginValue = (usernameInput.value || "").trim();
+            var passwordValue = plainPasswordInput.value || "";
+            if (!loginValue || !passwordValue) {
+              showError("请输入账号和密码");
+              return;
+            }
+
+            if (mode === MODE_LOCAL) {
+              submitNative();
+              return;
+            }
+
+            setBusy(true);
+            fetch(bffUrl(), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: loginValue, password: passwordValue })
+            })
+              .then(function (response) {
+                return response
+                  .json()
+                  .catch(function () {
+                    return {};
+                  })
+                  .then(function (body) {
+                    return { status: response.status, body: body };
+                  });
+              })
+              .then(function (result) {
+                var body = result.body || {};
+                if (body.ok && body.halo_username) {
+                  // 换成 forum-<user_id> 映射账号，密码不变。
+                  usernameInput.value = body.halo_username;
+                  submitNative();
+                  return;
+                }
+                setBusy(false);
+                if (result.status === 401) {
+                  showError(body.message || "账号或密码错误");
+                } else if (result.status === 403) {
+                  showError("当前来源不允许使用统一身份登录，请改用本地账号登录");
+                } else {
+                  showError("统一身份服务暂不可用，请稍后重试或改用本地账号登录");
+                }
+              })
+              .catch(function () {
+                setBusy(false);
+                showError("无法连接统一身份服务（" + bffUrl() + "），请确认服务已启动");
+              });
+          });
+
+          // bfcache 回退时复位，避免第二次提交被跳过预处理。
+          window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+              bypass = false;
+              setBusy(false);
+              passwordInput.value = "";
+            }
+          });
         });
-      });
+      })();
     </script>
   </th:block>
 

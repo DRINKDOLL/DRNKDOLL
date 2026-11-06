@@ -1,0 +1,50 @@
+@echo off
+rem ============================================================
+rem  Plaza auto-start (absolute paths, GBK encoded)
+rem    - Halo instance : port 8092
+rem    - Unified login BFF (forum account -> local session) : port 8095
+rem ============================================================
+
+set "JAVA=C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-lab/tools/jdk-21.0.13.0.2+1/bin/java.exe"
+set "JAR=C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-lab/jars/halo-2.27.2.jar"
+set "WORKDIR=C:/Users/LENOVO/Desktop/成果广场/output/plaza-20261103/halo-cn"
+set "PY=C:/Users/LENOVO/AppData/Local/Programs/Python/Python313-32/python.exe"
+
+cd /d "%WORKDIR%"
+
+set "HTTP_PROXY="
+set "HTTPS_PROXY="
+set "NO_PROXY=127.0.0.1,localhost,::1"
+set "no_proxy=127.0.0.1,localhost,::1"
+set "PYTHONPATH=%WORKDIR%"
+set "PYTHONIOENCODING=utf-8"
+
+rem ---- Halo ----
+netstat -ano | findstr ":8092" | findstr "LISTENING" >nul
+if %errorlevel%==0 goto halo_ready
+
+start "" "%JAVA%" -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Duser.language=zh -Duser.country=CN -Duser.timezone=Asia/Shanghai -jar "%JAR%" --spring.config.additional-location=file:./config/ --server.port=8092 --server.address=0.0.0.0
+
+:halo_ready
+
+rem ---- Unified login BFF ----
+rem Login page posts forum credentials to port 8095 for unified-identity check.
+rem If this service is down the page shows a hint and local accounts still work.
+netstat -ano | findstr ":8095" | findstr "LISTENING" >nul
+if %errorlevel%==0 goto bff_ready
+
+if not exist "run" mkdir "run"
+start "" /min "%PY%" -m gateway.login_server
+
+:bff_ready
+
+rem ---- Service-side gateway (IF-08 / IF-09 / reserved lab APIs) ----
+rem Read-only signed APIs consumed by forum/study/lab. Signed requests only.
+netstat -ano | findstr ":8094" | findstr "LISTENING" >nul
+if %errorlevel%==0 goto gw_ready
+
+start "" /min "%PY%" -m gateway.server
+
+:gw_ready
+
+exit /b 0

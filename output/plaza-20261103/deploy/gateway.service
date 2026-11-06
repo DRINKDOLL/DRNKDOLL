@@ -1,0 +1,17 @@
+[Unit]
+Description=Jingyuan Plaza - Unified Gateway Stub (IF-08 / reserved, localhost:8094)
+Documentation=file:/opt/plaza/README-DEPLOY.md
+After=network.target
+
+[Service]
+Type=simple
+# 以 /opt/plaza 为工作目录，python -m gateway.server 才能找到 gateway 包
+WorkingDirectory=/opt/plaza
+# 签名密钥等敏感项走 EnvironmentFile（600），不写进单元文件
+EnvironmentFile=/opt/plaza/config/gateway.env
+ExecStart=/usr/bin/python3.11 -m gateway.server
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
